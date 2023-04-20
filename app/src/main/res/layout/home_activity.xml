@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor">
+
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/scrollView2" />
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/Logo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-8dp"
+                app:srcCompat="@drawable/top_background" />
+
+
+            <TextView
+                android:id="@+id/TextName"
+                android:layout_width="229dp"
+                android:layout_height="78dp"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="-130dp"
+                android:text="{name}"
+                android:textColor="@color/white"
+                android:textSize="27sp"
+                android:textStyle="bold"
+                tools:layout_marginRight="32dp" />
+
+            <TextView
+                android:id="@+id/TextHello"
+                android:layout_width="229dp"
+                android:layout_height="96dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginTop="-130dp"
+                android:text="Hello"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:layout_marginRight="32dp" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/profilePicBtn"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="right"
+                android:layout_marginTop="-110dp"
+                android:layout_marginRight="50dp"
+                android:background="@drawable/image_button_border"
+                android:backgroundTint="@color/white"
+                android:scaleType="fitXY"
+                android:src="@drawable/default_profile_pic"
+                android:textColor="@color/white"
+                app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
+                app:strokeColor="@null"
+
+                />
+
+            <ImageButton
+                android:id="@+id/omegleBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="150dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/meet_new_friends_button"
+                android:textColor="#707070" />
+
+            <Button
+                android:id="@+id/RegisterBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="35dp"
+                android:layout_marginRight="32dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:text="Have an account? Login"
+                android:textAllCaps="false"
+                android:textColor="#707070" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/inboxBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="80dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/inbox"
+                    android:textColor="#707070" />
+
+                <ImageButton
+                    android:id="@+id/friendsBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="70dp"
+                    android:layout_marginTop="80dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/friends"
+                    android:textColor="#707070" />
+
+                <ImageButton
+                    android:id="@+id/settingsBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="80dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/settings"
+                    android:textColor="#707070" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:baselineAligned="false"
+            >
+
+            <ImageView
+                android:id="@+id/Logo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-14dp"
+                app:srcCompat="@drawable/logo" />
+
+            <TextView
+                android:id="@+id/WelcomeBackText"
+                android:layout_width="181dp"
+                android:layout_height="135dp"
+                android:layout_marginLeft="90dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:text="Create Account"
+                android:textColor="#FFC21C"
+                android:textSize="42sp"
+                android:textStyle="bold"
+                tools:layout_marginRight="32dp" />
+
+            <EditText
+                android:id="@+id/editTextTextHello"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="32dp"
+                android:drawableStart="@drawable/name"
+                android:ems="10"
+                android:hint="  Name"
+                android:inputType="text"
+                android:textColor="#756C6C"
+                android:textColorHighlight="#756C6C" />
+
+            <EditText
+                android:id="@+id/editTextTextEmailAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="32dp"
+                android:drawableStart="@drawable/email"
+                android:ems="10"
+                android:hint="  Email"
+                android:inputType="textEmailAddress"
+                android:textColor="#756C6C"
+                android:textColorHighlight="#756C6C" />
+
+            <EditText
+                android:id="@+id/editTextTextPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="32dp"
+                android:drawableStart="@drawable/password"
+                android:ems="10"
+
+                android:hint="  Password"
+                android:inputType="textPassword"
+                android:textColor="#756C6C"
+                android:textColorHighlight="#756C6C" />
+
+
+            <ImageButton
+                android:id="@+id/RegisterBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="300dp"
+                android:layout_marginTop="100dp"
+                android:layout_marginRight="0dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/btn_arrow2"
+                android:textColor="#707070" />
+
+            <Button
+                android:id="@+id/omegleBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginTop="35dp"
+                android:layout_marginRight="32dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:text="Have an account? Login or other sign in options"
+                android:textAllCaps="false"
+                android:textColor="#707070" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
