@@ -1,4 +1,4 @@
-package com.example.omeglewhatsapphybrid;
+package ActivitiesLogic;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.omeglewhatsapphybrid.R;
+import UtilityClasses.UtilityFunctions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;

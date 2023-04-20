@@ -1,4 +1,4 @@
-package com.example.omeglewhatsapphybrid;
+package UtilityClasses;
 
 import java.util.ArrayList;
 import java.util.HashMap;

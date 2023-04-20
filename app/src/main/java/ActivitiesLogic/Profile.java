@@ -1,43 +1,34 @@
-package com.example.omeglewhatsapphybrid;
+package ActivitiesLogic;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
+import UtilityClasses.Actions;
+import com.example.omeglewhatsapphybrid.R;
+import UtilityClasses.UtilityFunctions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.UUID;
 
 public class Profile extends AppCompatActivity {
 
@@ -98,7 +89,7 @@ public class Profile extends AppCompatActivity {
             public void onClick(View v) {
                 Intent photoIntent = new Intent(Intent.ACTION_PICK);
                 photoIntent.setType("image/*");
-                startActivityForResult(photoIntent,Actions.CHANGE_PROFILE_PICTURE);
+                startActivityForResult(photoIntent, Actions.CHANGE_PROFILE_PICTURE);
             }
         });
 

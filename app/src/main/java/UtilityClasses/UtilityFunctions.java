@@ -1,25 +1,20 @@
-package com.example.omeglewhatsapphybrid;
+package UtilityClasses;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.widget.ImageView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.bumptech.glide.Glide;
-import com.google.firebase.auth.FirebaseUser;
+import com.example.omeglewhatsapphybrid.R;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.IOException;
-import java.net.URL;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+
+import UtilityClasses.User;
 
 public class UtilityFunctions {
 

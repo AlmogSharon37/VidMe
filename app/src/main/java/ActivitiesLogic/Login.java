@@ -1,7 +1,6 @@
-package com.example.omeglewhatsapphybrid;
+package ActivitiesLogic;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -14,6 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import UtilityClasses.Actions;
+import com.example.omeglewhatsapphybrid.R;
+import UtilityClasses.UtilityFunctions;
 import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;

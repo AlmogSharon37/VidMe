@@ -1,12 +1,9 @@
-package com.example.omeglewhatsapphybrid;
+package ActivitiesLogic;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.firebase.auth.FirebaseAuthSettings;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 

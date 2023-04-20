@@ -1,4 +1,4 @@
-package com.example.omeglewhatsapphybrid;
+package ActivitiesLogic;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,11 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.omeglewhatsapphybrid.R;
+import UtilityClasses.User;
+import UtilityClasses.UtilityFunctions;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;

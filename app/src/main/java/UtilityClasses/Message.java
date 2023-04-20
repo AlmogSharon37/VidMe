@@ -1,4 +1,4 @@
-package com.example.omeglewhatsapphybrid;
+package UtilityClasses;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

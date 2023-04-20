@@ -1,4 +1,4 @@
-package com.example.omeglewhatsapphybrid;
+package UtilityClasses;
 
 
 //Enums are very expensive in memory, so i used an abstract class with static final ints! ;)

@@ -23,7 +23,7 @@
         <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
 
         <activity
-            android:name=".MainActivity"
+            android:name="ActivitiesLogic.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,56 +35,56 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name=".Register"
+        <activity android:name="ActivitiesLogic.Register"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login"
+        <activity android:name="ActivitiesLogic.Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Home"
+        <activity android:name="ActivitiesLogic.Home"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Profile"
+        <activity android:name="ActivitiesLogic.Profile"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Settings"
+        <activity android:name="ActivitiesLogic.Settings"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Friends"
+        <activity android:name="ActivitiesLogic.Friends"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Inbox"
+        <activity android:name="ActivitiesLogic.Inbox"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".FriendsProfile"
+        <activity android:name="ActivitiesLogic.FriendsProfile"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Chat"
+        <activity android:name="ActivitiesLogic.Chat"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />

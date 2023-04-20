@@ -1,8 +1,7 @@
-package com.example.omeglewhatsapphybrid;
+package ActivitiesLogic;
 
 import android.content.Context;
 import android.net.Uri;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
+import UtilityClasses.Message;
+import com.example.omeglewhatsapphybrid.R;
+import UtilityClasses.UtilityFunctions;
 
 import java.util.ArrayList;
 
