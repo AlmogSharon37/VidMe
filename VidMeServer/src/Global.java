@@ -7,7 +7,7 @@ public class Global {
 
 
 
-    public boolean clientHashMapInit(){
+    public static boolean clientHashMapInit(){
         try{
             Clients = new HashMap<String, Socket>();
             return true;

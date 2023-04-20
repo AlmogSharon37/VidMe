@@ -1,0 +1,12 @@
+Protocol:
+	Syntax:
+		client identifier - C , server identifier - S
+		splitter - "|"
+		LENGTH|IDENTIFIER|ACTION|VAR1|VAR2|...|VARN|\n
+		
+
+	Actions:
+		CLIENT INIT - prompts client to send server his uuid for initialisation
+			      or prompts server to add this client uuid to hashmap
+		
+		
