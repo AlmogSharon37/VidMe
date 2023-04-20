@@ -25,7 +25,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestH
     private RequestAdapter.OnClickListener onClickAcceptListener;
     private RequestAdapter.OnClickListener onClickDenyListener;
 
-    interface OnClickListener{
+    public interface OnClickListener{
         void onClick(int position);
     }
 
