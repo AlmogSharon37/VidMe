@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.omeglewhatsapphybrid.R;
+
+import Adapters.UsersAdapter;
 import UtilityClasses.User;
 import UtilityClasses.UtilityFunctions;
 import com.google.firebase.auth.FirebaseAuth;

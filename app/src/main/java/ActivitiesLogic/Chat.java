@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import Adapters.MessageAdapter;
 import UtilityClasses.Message;
 import com.example.omeglewhatsapphybrid.R;
 import UtilityClasses.UtilityFunctions;

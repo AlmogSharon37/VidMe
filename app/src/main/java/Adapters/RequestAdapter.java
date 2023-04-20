@@ -1,4 +1,4 @@
-package ActivitiesLogic;
+package Adapters;
 
 import android.content.Context;
 import android.net.Uri;
