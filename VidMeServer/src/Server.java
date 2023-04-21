@@ -11,6 +11,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -84,6 +85,10 @@ public class Server {
             clientChannel.configureBlocking(false);
             clientChannel.register(selector, SelectionKey.OP_READ);
             System.out.println("Accepted connection from " + clientChannel.socket().getRemoteSocketAddress());
+            String toSend = MessageBuilder.buildString("INIT");
+            sendToClient(clientChannel, toSend);
+            // now ask the client to give his uuid to add to the server hashmap! :)
+
 
         }
         catch(IOException e){
@@ -93,27 +98,10 @@ public class Server {
 
     private void handleRecv(SelectionKey key){
         try{
-            SocketChannel clientChannel = (SocketChannel) key.channel();
-            buffer.clear();
-            int numBytes = clientChannel.read(buffer);
-
-            if (numBytes == -1) {
-                key.cancel();
-                clientChannel.close();
-
-            }
-
-            else {
-                String message = new String(buffer.array(), 0, numBytes, charset);
-                System.out.println("Received message: " + message);
-                // process the message and prepare a response
-                String response = message.toUpperCase();
-                clientChannel.register(selector, SelectionKey.OP_WRITE, ByteBuffer.wrap(response.getBytes(charset)));
-            }
-
-
+            String message = recvFromClient(key);
+            handleMessage(message, key);
         }
-        catch (IOException e){
+        catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -132,6 +120,81 @@ public class Server {
         catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+
+    private String recvFromClient(SelectionKey key){
+        try{
+            SocketChannel clientChannel = (SocketChannel) key.channel();
+            buffer.clear();
+            int numBytes = clientChannel.read(buffer);
+
+            if (numBytes == -1) {
+                key.cancel();
+                clientChannel.close();
+                return "CLOSE";
+            }
+
+            else {
+                String message = new String(buffer.array(), 0, numBytes, charset);
+                System.out.println("Received message: " + message);
+                return message;
+            }
+
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            return "ERR";
+        }
+    }
+
+    private void sendToClient(SelectionKey key, String syntaxedMsg){
+        try {
+            SocketChannel clientChannel = (SocketChannel) key.channel();
+            ByteBuffer callBuffer = charset.encode(syntaxedMsg);
+            clientChannel.register(selector, SelectionKey.OP_WRITE, callBuffer);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void sendToClient(SocketChannel channel, String syntaxedMsg){
+        try {
+
+            ByteBuffer callBuffer = charset.encode(syntaxedMsg);
+            channel.register(selector, SelectionKey.OP_WRITE, callBuffer);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public String handleMessage(String message, SelectionKey key){
+        SocketChannel clientChannel = (SocketChannel) key.channel();
+        //LENGTH|IDENTIFIER|ACTION|VAR1|VAR2|...|VARN|\n
+
+        String[] all =  message.split("\\|");
+        String[] vars = Arrays.copyOfRange(all, 3, all.length);
+        String action = all[2];
+        switch (action){
+
+            case "INIT":
+                //client sent init so variable0 is his uuid! need to save it inside our hashmap
+                Global.Clients.put(vars[0], clientChannel);
+                sendToClient(key, MessageBuilder.buildString("ACK"));
+
+                break;
+
+        }
+
+
+
+
+        return null;
     }
 
 }

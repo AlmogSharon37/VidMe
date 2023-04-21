@@ -2,11 +2,15 @@ Protocol:
 	Syntax:
 		client identifier - C , server identifier - S
 		splitter - "|"
-		LENGTH|IDENTIFIER|ACTION|VAR1|VAR2|...|VARN|\n
+		LENGTH|IDENTIFIER|ACTION|VAR0|VAR1|...|VARN|\n
 		
 
 	Actions:
-		CLIENT INIT - prompts client to send server his uuid for initialisation
+		INIT - prompts client to send server his uuid for initialisation
 			      or prompts server to add this client uuid to hashmap
+
+	    CLOSE - prompts server/client to close the connection
+
+	    ERR - means there has been an error
 		
 		

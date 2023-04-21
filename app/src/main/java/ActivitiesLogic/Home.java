@@ -103,7 +103,7 @@ public class Home extends AppCompatActivity {
             if(Global.FIRST_TIME_CONNECT_SERVER == 1) {
                 Global.FIRST_TIME_HOME();
                 System.out.println("herlo");
-                RecvThread t = new RecvThread("10.0.2.2", 8820);
+                RecvThread t = new RecvThread(user.getUid(),"10.0.2.2", 8820);
                 Thread recv = new Thread(t);
                 recv.start();
             }
