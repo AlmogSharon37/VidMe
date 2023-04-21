@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import UtilityClasses.Global;
+
 public class Settings extends AppCompatActivity {
 
     FirebaseAuth mAuth;
@@ -57,6 +59,7 @@ public class Settings extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mAuth.signOut();
+                Global.FIRST_TIME_HOME();
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);
                 finish();

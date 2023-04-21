@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,13 +18,16 @@ public class Server {
 
     private ServerSocketChannel serverSocket;
     private int portNumber;
+    private String ip;
     private Selector selector;
     private ByteBuffer buffer;
     private Charset charset;
 
-    public Server(int port) { //initialisation
+    public Server(String ip, int port) { //initialisation
         try {
             System.out.println("Server is starting");
+            this.ip = ip;
+            this.portNumber = port;
             serverSocket = ServerSocketChannel.open();
             serverSocket.socket().bind(new InetSocketAddress(portNumber));
             serverSocket.configureBlocking(false); // set non-blocking mode

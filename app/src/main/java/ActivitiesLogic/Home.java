@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.omeglewhatsapphybrid.R;
 
 import Networking.RecvThread;
+import UtilityClasses.Global;
 import UtilityClasses.UtilityFunctions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -99,10 +100,13 @@ public class Home extends AppCompatActivity {
                     finish();
                 }
             });
-            System.out.println("herlo");
-            RecvThread t = new RecvThread("10.0.0.10", 8820 );
-            Thread recv = new Thread(t);
-            recv.start();
+            if(Global.FIRST_TIME_CONNECT_SERVER == 1) {
+                Global.FIRST_TIME_HOME();
+                System.out.println("herlo");
+                RecvThread t = new RecvThread("10.0.2.2", 8820);
+                Thread recv = new Thread(t);
+                recv.start();
+            }
 
 
         }

@@ -5,11 +5,14 @@ import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 public class RecvThread implements Runnable{
 
-    private Socket clientSocket;
+    private SocketChannel clientSocket;
     private int port;
     private String address;
 
@@ -21,23 +24,35 @@ public class RecvThread implements Runnable{
 
     @Override
     public void run() {
-        try{
-            System.out.println("Starin");
-            clientSocket = new Socket(address, port);
-            // Create an input stream to receive messages from the server
-            InputStream inputStream = clientSocket.getInputStream();
-            BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+        try {
+            System.out.println("Starting");
+            clientSocket = SocketChannel.open();
+            clientSocket.configureBlocking(false);
+            clientSocket.connect(new InetSocketAddress(address, port));
+            while (!clientSocket.finishConnect()) {
+                // Wait for connection to be established
+
+            }
+
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
 
             //need to start send thread here! -------------
 
             // Continuously listen for messages from the server
-            String message;
-            while ((message = in.readLine()) != null) {
-                System.out.println("Received message from server: " + message);
-            }
+            while (true) {
+                int bytesRead = clientSocket.read(buffer);
+                if (bytesRead > 0) {
+                    buffer.flip();
+                    byte[] bytes = new byte[bytesRead];
+                    buffer.get(bytes, 0, bytesRead);
+                    System.out.println("Received message: " + new String(bytes));
+                    buffer.clear();
+                }
 
+            }
         }
         catch (IOException e){
+            System.out.println("not wokint");
             e.printStackTrace();
         }
     }
