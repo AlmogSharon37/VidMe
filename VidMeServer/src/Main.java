@@ -5,7 +5,7 @@ public class Main {
 
             Global.clientHashMapInit(); // initialising client hashmap
 
-            Server server = new Server(1111);
+            Server server = new Server(8820);
             server.startServer();
         }
     }

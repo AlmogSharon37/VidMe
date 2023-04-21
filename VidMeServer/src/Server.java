@@ -23,6 +23,7 @@ public class Server {
 
     public Server(int port) { //initialisation
         try {
+            System.out.println("Server is starting");
             serverSocket = ServerSocketChannel.open();
             serverSocket.socket().bind(new InetSocketAddress(portNumber));
             serverSocket.configureBlocking(false); // set non-blocking mode
@@ -40,6 +41,7 @@ public class Server {
 
 
     public void startServer() {
+        System.out.println("now it real start");
         try{
         while (true) {
             selector.select(); // wait for an event on the registered channels
