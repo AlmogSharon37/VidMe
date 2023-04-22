@@ -3,6 +3,7 @@ package Networking;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -10,6 +11,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
+import ActivitiesLogic.Friends;
+import ActivitiesLogic.Home;
+import ActivitiesLogic.Login;
 import ActivitiesLogic.ReceivedCall;
 
 public class NetworkThread extends Thread{
@@ -29,6 +33,7 @@ public class NetworkThread extends Thread{
         this.address = addr;
         this.port = port;
         handler = new Handler();
+
     }
 
     public SocketChannel getClientSocket() {
@@ -118,11 +123,18 @@ public class NetworkThread extends Thread{
 
                 currentActivity.startActivity(acceptDeclineIntent);
 
-                // Post a delayed message to switch back to the previous activity after 5 seconds
+                // Post a delayed message to switch back to the previous activity after x seconds
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        Intent previousActivityIntent = new Intent(currentActivity, currentActivity.getClass());
+                        Thread sendToServer = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                sendToServer(buildString("CALLDECLINE", callerUuid));
+                            }
+                        });
+                        sendToServer.start();
+                        Intent previousActivityIntent = new Intent(currentActivity, Home.class);
                         currentActivity.startActivity(previousActivityIntent);
                     }
                 }, 10000); // 10 second delay
@@ -130,17 +142,28 @@ public class NetworkThread extends Thread{
 
 
             case "CALLDECLINE":
-                handler.postDelayed(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Intent previousActivityIntent = new Intent(currentActivity, currentActivity.getClass());
+                        Intent previousActivityIntent = new Intent(currentActivity, Home.class);
                         currentActivity.startActivity(previousActivityIntent);
                     }
-                }, 0);
+                });
 
 
 
                 break;
+
+
+            case "CALLBUSY":
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent previousActivityIntent = new Intent(currentActivity, Home.class);
+                        currentActivity.startActivity(previousActivityIntent);
+                        Toast.makeText(currentActivity, "This user is offline or busy with a call", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
 
 

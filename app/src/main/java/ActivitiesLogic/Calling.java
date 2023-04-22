@@ -91,7 +91,11 @@ public class Calling extends AppCompatActivity {
                 });
                 sendToServer.start();
 
-                Intent intent = new Intent(activity, activity.getClass());
+                Intent intent = new Intent(activity, activity.getClass())
+                        .putExtra("friendUid",friendUuid)
+                                .putExtra("friendImg", friendProfilePicStr)
+                                        .putExtra("friendName", friendNameStr);
+
                 activity.startActivity(intent);
                 //speed up the process of waiting till the call request is automatically denied
 
