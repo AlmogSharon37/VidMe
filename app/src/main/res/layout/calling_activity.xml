@@ -19,7 +19,7 @@
         android:id="@+id/incomingCallText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Incoming call!"
+        android:text="Calling!"
         android:textAlignment="center"
         android:textSize="40dp"
         android:textColor="@color/grayColor"
@@ -46,42 +46,20 @@
         app:layout_constraintVertical_bias="0.011" />
 
 
-    <LinearLayout
-        android:layout_width="413dp"
-        android:layout_height="137dp"
-        android:layout_marginTop="620dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageButton
+        android:id="@+id/declineBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:scaleX="1.3"
+        android:scaleY="1.3"
+        android:src="@drawable/decline_call_btn"
+
+        app:layout_constraintBottom_toBottomOf="@+id/callerProfilePic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageButton
-            android:id="@+id/acceptBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="100dp"
-            android:background="@android:color/transparent"
-            android:scaleX="1.3"
-            android:scaleY="1.3"
-            android:src="@drawable/accept_call_btn"
-
-
-            />
-
-        <ImageButton
-            android:id="@+id/declineBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="70dp"
-            android:background="@android:color/transparent"
-            android:scaleX="1.3"
-            android:scaleY="1.3"
-            android:src="@drawable/decline_call_btn"
-
-            />
-
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.888" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

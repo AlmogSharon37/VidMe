@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 //import com.facebook.CallbackManager;
 import com.example.omeglewhatsapphybrid.R;
 
-import Networking.RecvThread;
+import Networking.NetworkThread;
 import UtilityClasses.Global;
 import UtilityClasses.UtilityFunctions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,6 +25,7 @@ public class Home extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     DatabaseReference mDatabase;
+
 
 
     ProgressBar progressBar;
@@ -63,6 +64,14 @@ public class Home extends AppCompatActivity {
             settingsBtn = findViewById(R.id.settingsBtn);
             omegleBtn = findViewById(R.id.omegleBtn);
 
+            if(Global.FIRST_TIME_CONNECT_SERVER == 1) {
+                Global.FIRST_TIME_HOME();
+                Global.networkThread = new NetworkThread(user.getUid(),"10.0.2.2", 8820);
+                Global.networkThread.setCurrentActivity(this);
+                Global.networkThread.start();
+
+            }
+
 
             NameText.setText(user.getDisplayName());
             UtilityFunctions.setImageOnImageView(this, user.getPhotoUrl(), profileBtn);
@@ -100,13 +109,7 @@ public class Home extends AppCompatActivity {
                     finish();
                 }
             });
-            if(Global.FIRST_TIME_CONNECT_SERVER == 1) {
-                Global.FIRST_TIME_HOME();
-                System.out.println("herlo");
-                RecvThread t = new RecvThread(user.getUid(),"10.0.2.2", 8820);
-                Thread recv = new Thread(t);
-                recv.start();
-            }
+
 
 
         }

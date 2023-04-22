@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.omeglewhatsapphybrid.R;
 
 import Adapters.UsersAdapter;
+import UtilityClasses.Global;
 import UtilityClasses.User;
 import UtilityClasses.UtilityFunctions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -61,6 +62,8 @@ public class Friends extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
+
+        Global.networkThread.setCurrentActivity(this);
 
         progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.recycler);

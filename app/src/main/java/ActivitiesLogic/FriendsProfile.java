@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.omeglewhatsapphybrid.R;
+
+import UtilityClasses.Global;
 import UtilityClasses.UtilityFunctions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,6 +48,8 @@ public class FriendsProfile extends AppCompatActivity {
         //initialization of ui components and firebase stuff.
         mDatabase = FirebaseDatabase.getInstance();
         mStorage = FirebaseStorage.getInstance();
+
+        Global.networkThread.setCurrentActivity(this);
 
         nameTextBig = findViewById(R.id.UsernameBigText);
         profilePicBtn = findViewById(R.id.profilePicBtn);
@@ -84,6 +88,25 @@ public class FriendsProfile extends AppCompatActivity {
                         .putExtra("friendUid", friendUid)
                         .putExtra("friendImg", friendImg)
                         .putExtra("friendName", friendName);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        phoneBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String message = Global.networkThread.buildString("CALL", friendUid);
+                Thread sendToServer = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Global.networkThread.sendToServer(message);
+                    }
+                });
+                sendToServer.start();
+                Intent intent = new Intent(getApplicationContext(), Calling.class)
+                        .putExtra("friendUuid", friendUid);
+
                 startActivity(intent);
                 finish();
             }

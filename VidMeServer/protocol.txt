@@ -2,12 +2,59 @@ Protocol:
 	Syntax:
 		client identifier - C , server identifier - S
 		splitter - "|"
-		LENGTH|IDENTIFIER|ACTION|VAR0|VAR1|...|VARN|\n
+		LENGTH|IDENTIFIER|ACTION|VAR0|VAR1|...|VARN
 		
+    These are all the types of messages that can be sent with the protocol, including the added variables that
+    the server sends, and the client sends.
+
+    ** I will provide examples under each type but will exclude the length variable since it is not necessary for understanding the protocol.
 
 	Actions:
 		INIT - prompts client to send server his uuid for initialisation
-			      or prompts server to add this client uuid to hashmap
+			      and prompts server to add this client uuid to hashmap
+			   added variables:       Server - NONE     |     Client - VAR0 = Client.uuid
+			   Example:
+			           --> |S|INIT
+			           --> |C|INIT|this.uuid
+			           --> |S|ACK
+
+
+	    CALL - prompts server to initiate a call request to a specified user (Client2) from the sender (Client1)
+	           added variables:       Server - VAR0 = Client1.uuid    |     Client - VAR0 = Client2.uuid
+	           Example:
+               		   --> |C|CALL|(to)Client2.uuid            (client1 to server)
+               		   --> |S|CALL|(from)Client1.uuid          (server to client2)
+
+
+
+	    CALLDECLINE - prompts server to send the caller (Client1) that the user he called (Client2) has declined his call request
+	                  added variables:       Server - NONE      | Client - VAR0 = Client1.uuid
+	                  Example:
+                              --> |C|CALL|(to)Client2.uuid         (client1 to server)
+                              --> |S|CALL|(from)Client1.uuid       (server to client2)
+                              --> |C|CALLDECLINE|Client1.uuid      (client2 to server)
+                              --> |S|CALLDECLINE                   (server to client1)
+
+
+	    CALLACCEPT -  prompts server to send the caller (Client1) that the user he called (Client2) has accepted his call request
+	                  and to initiate a call between the clients
+                      added variables:       Server - NONE     | Client - VAR0 = Client1.uuid
+                      Example:
+                               --> |C|CALL|(to)Client2.uuid         (client1 to server)
+                               --> |S|CALL|(from)Client1.uuid       (server to client2)
+                               --> |C|CALLACCEPT|Client1.uuid       (client2 to server)
+                               --> |S|CALLACCEPT                    (server to client1)
+
+
+
+        CALLBUSY -  prompts server to send the caller (Client1) that the user he called (Client2) is busy,
+                    this is used if the client trying to be called is inside a call already or getting a call from another person
+                    or client is offline
+                    added variables:       Server - NONE    | Client - the client cannot send this message as it is determined by the server
+                    Example:
+                            --> |C|CALL|(to)Client2.uuid         (client1 to server)
+                            --> |S|CALLBUSY                      (server to client1)
+
 
 	    CLOSE - prompts server/client to close the connection
 

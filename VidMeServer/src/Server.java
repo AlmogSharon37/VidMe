@@ -99,6 +99,7 @@ public class Server {
     private void handleRecv(SelectionKey key){
         try{
             String message = recvFromClient(key);
+            System.out.println("Received message: " + message);
             handleMessage(message, key);
         }
         catch (Exception e){
@@ -132,19 +133,18 @@ public class Server {
             if (numBytes == -1) {
                 key.cancel();
                 clientChannel.close();
-                return "CLOSE";
+                return "-1|C|CLOSE";
             }
 
             else {
                 String message = new String(buffer.array(), 0, numBytes, charset);
-                System.out.println("Received message: " + message);
                 return message;
             }
 
         }
         catch (IOException e){
             e.printStackTrace();
-            return "ERR";
+            return "-1|C|ERR";
         }
     }
 
@@ -153,18 +153,21 @@ public class Server {
             SocketChannel clientChannel = (SocketChannel) key.channel();
             ByteBuffer callBuffer = charset.encode(syntaxedMsg);
             clientChannel.register(selector, SelectionKey.OP_WRITE, callBuffer);
+            System.out.println("Server sends to " + clientChannel.socket().getRemoteSocketAddress() + ": "  + syntaxedMsg);
         }
         catch (Exception e){
             e.printStackTrace();
         }
 
+
     }
 
-    private void sendToClient(SocketChannel channel, String syntaxedMsg){
+    private void sendToClient(SocketChannel channel, String syntaxedMsg){ // overloading function
         try {
 
             ByteBuffer callBuffer = charset.encode(syntaxedMsg);
             channel.register(selector, SelectionKey.OP_WRITE, callBuffer);
+            System.out.println("Server sends to " + channel.socket().getRemoteSocketAddress() + ": "  + syntaxedMsg);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -178,16 +181,37 @@ public class Server {
         //LENGTH|IDENTIFIER|ACTION|VAR1|VAR2|...|VARN|\n
 
         String[] all =  message.split("\\|");
-        String[] vars = Arrays.copyOfRange(all, 3, all.length);
+        String[] vars = null;
+        if(all.length >= 3)
+            vars = Arrays.copyOfRange(all, 3, all.length);
         String action = all[2];
         switch (action){
 
             case "INIT":
                 //client sent init so variable0 is his uuid! need to save it inside our hashmap
-                Global.Clients.put(vars[0], clientChannel);
+                Global.putInClientsHashmap(vars[0], clientChannel);
                 sendToClient(key, MessageBuilder.buildString("ACK"));
+                break;
+
+            case "CALL":
+                //client sent call so variable0 is the uuid of who to call! need to call him and put both of them
+                //in the uncallable hashmap since they cant be called
+                if(Global.Clients.containsKey(vars[0]) && !Global.ClientsUnCallable.containsKey(vars[0])){
+                    //meaning this client is online and not busy
+                    String senderClientUuid = Global.ClientsInverse.get(clientChannel);  //get the caller uuid
+                    sendToClient(Global.Clients.get(vars[0]), MessageBuilder.buildString("CALL", senderClientUuid)); // send to called client call request from caller
+                    Global.putInUncallableHashmap(senderClientUuid, vars[0]); // add them both to busy hashmap
+                    System.out.println("added them both to uncallable");
+                }
+                else sendToClient(Global.Clients.get(vars[0]), MessageBuilder.buildString("CALLBUSY"));
 
                 break;
+
+            case "CALLDECLINE":
+                //client to send him the decline is in vars[0]
+                //need to send him that the call has been declined and remove both from the uncallable hashmap
+                Global.removeFromUncallableHashmap(vars[0], Global.ClientsInverse.get(clientChannel));
+                sendToClient(Global.Clients.get(vars[0]),MessageBuilder.buildString("CALLDECLINE"));
 
         }
 

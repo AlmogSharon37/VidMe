@@ -1,9 +1,11 @@
 package UtilityClasses;
 
+import Networking.NetworkThread;
+
 public class Global {
 
     public static int FIRST_TIME_CONNECT_SERVER = 1;
-
+    public static NetworkThread networkThread;
 
 
 

@@ -37,6 +37,8 @@ public class Settings extends AppCompatActivity {
         //initialization of ui components and firebase stuff.
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        Global.networkThread.setCurrentActivity(this);
+
         backBtn = findViewById(R.id.backButton);
         logoutBtn = findViewById(R.id.logoutBtn);
 
@@ -60,6 +62,9 @@ public class Settings extends AppCompatActivity {
             public void onClick(View v) {
                 mAuth.signOut();
                 Global.FIRST_TIME_HOME();
+                Global.networkThread.closeThread();
+                Global.networkThread = null;
+
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);
                 finish();

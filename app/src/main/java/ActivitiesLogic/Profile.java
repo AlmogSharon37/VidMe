@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import UtilityClasses.Actions;
 import com.example.omeglewhatsapphybrid.R;
+
+import UtilityClasses.Global;
 import UtilityClasses.UtilityFunctions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -56,6 +58,8 @@ public class Profile extends AppCompatActivity {
         //initialization of ui components and firebase stuff.
         mDatabase = FirebaseDatabase.getInstance();
         mStorage = FirebaseStorage.getInstance();
+
+        Global.networkThread.setCurrentActivity(this);
 
         nameTextBig = findViewById(R.id.UsernameBigText);
         profilePicBtn = findViewById(R.id.profilePicBtn);

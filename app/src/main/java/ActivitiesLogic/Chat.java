@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import Adapters.MessageAdapter;
+import UtilityClasses.Global;
 import UtilityClasses.Message;
 import com.example.omeglewhatsapphybrid.R;
 import UtilityClasses.UtilityFunctions;
@@ -58,6 +59,8 @@ public class Chat extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
+
+        Global.networkThread.setCurrentActivity(this);
 
         recyclerView = findViewById(R.id.recycler);
         progressBar = findViewById(R.id.progressBar);
