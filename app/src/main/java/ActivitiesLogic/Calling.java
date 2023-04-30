@@ -83,13 +83,7 @@ public class Calling extends AppCompatActivity {
                 Activity activity = Global.networkThread.getCurrentActivity();
                 handler.removeCallbacksAndMessages(null);
                 String message = Global.networkThread.buildString("CALLDECLINE", friendUuid);
-                Thread sendToServer = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Global.networkThread.sendToServer(message);
-                    }
-                });
-                sendToServer.start();
+                Global.networkThread.sendToServer(message);
 
                 Intent intent = new Intent(activity, activity.getClass())
                         .putExtra("friendUid",friendUuid)

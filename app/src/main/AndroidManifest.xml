@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
 
@@ -97,6 +99,12 @@
             </intent-filter>
         </activity>
         <activity android:name="ActivitiesLogic.Calling"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name="ActivitiesLogic.InCall"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEFAULT" />

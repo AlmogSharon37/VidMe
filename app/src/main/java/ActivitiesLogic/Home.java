@@ -66,7 +66,7 @@ public class Home extends AppCompatActivity {
 
             if(Global.FIRST_TIME_CONNECT_SERVER == 1) {
                 Global.FIRST_TIME_HOME();
-                Global.networkThread = new NetworkThread(user.getUid(),"10.0.2.2", 8820);
+                Global.networkThread = new NetworkThread(user.getUid(),"10.0.0.8", 8820);
                 Global.networkThread.setCurrentActivity(this);
                 Global.networkThread.start();
 

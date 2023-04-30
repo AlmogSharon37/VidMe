@@ -7,6 +7,8 @@ Protocol:
     These are all the types of messages that can be sent with the protocol, including the added variables that
     the server sends, and the client sends.
 
+    * in most messages from the client, he will send his own uuid on var0 for identification
+
     ** I will provide examples under each type but will exclude the length variable since it is not necessary for understanding the protocol.
 
 	Actions:
@@ -20,30 +22,30 @@ Protocol:
 
 
 	    CALL - prompts server to initiate a call request to a specified user (Client2) from the sender (Client1)
-	           added variables:       Server - VAR0 = Client1.uuid    |     Client - VAR0 = Client2.uuid
+	           added variables:       Server - VAR0 = Client1.uuid    |     Client - VAR0 = Client1.uuid , VAR1 = Client2.uuid
 	           Example:
-               		   --> |C|CALL|(to)Client2.uuid            (client1 to server)
-               		   --> |S|CALL|(from)Client1.uuid          (server to client2)
+               		   --> |C|CALL|Client1.uuid|(to)Client2.uuid            (client1 to server)
+               		   --> |S|CALL|(from)Client1.uuid                       (server to client2)
 
 
 
 	    CALLDECLINE - prompts server to send the caller (Client1) that the user he called (Client2) has declined his call request
-	                  added variables:       Server - NONE      | Client - VAR0 = Client1.uuid
+	                  added variables:       Server - NONE      | Client - VAR0 = Client2.uuid, VAR1 = Client1.uuid
 	                  Example:
-                              --> |C|CALL|(to)Client2.uuid         (client1 to server)
-                              --> |S|CALL|(from)Client1.uuid       (server to client2)
-                              --> |C|CALLDECLINE|Client1.uuid      (client2 to server)
-                              --> |S|CALLDECLINE                   (server to client1)
+                              --> |C|CALL|Client1.uuid|(to)Client2.uuid         (client1 to server)
+                              --> |S|CALL|(from)Client1.uuid                    (server to client2)
+                              --> |C|CALLDECLINE|Client2.uuid|Client1.uuid      (client2 to server)
+                              --> |S|CALLDECLINE                                (server to client1)
 
 
 	    CALLACCEPT -  prompts server to send the caller (Client1) that the user he called (Client2) has accepted his call request
 	                  and to initiate a call between the clients
-                      added variables:       Server - NONE     | Client - VAR0 = Client1.uuid
+                      added variables:       Server - VAR0 = Client2.uuid      | Client - VAR0 = Client2.uuid, VAR1 = Client1.uuid
                       Example:
-                               --> |C|CALL|(to)Client2.uuid         (client1 to server)
-                               --> |S|CALL|(from)Client1.uuid       (server to client2)
-                               --> |C|CALLACCEPT|Client1.uuid       (client2 to server)
-                               --> |S|CALLACCEPT                    (server to client1)
+                               --> |C|CALL|Client1.uuid|(to)Client2.uuid         (client1 to server)
+                               --> |S|CALL|(from)Client1.uuid                    (server to client2)
+                               --> |C|CALLACCEPT|Client2.uuid|Client1.uuid       (client2 to server)
+                               --> |S|CALLACCEPT|Client2.uuid                    (server to client1)
 
 
 

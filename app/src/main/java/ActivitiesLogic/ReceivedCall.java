@@ -83,7 +83,17 @@ public class ReceivedCall extends AppCompatActivity {
         acceptCallBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("works please take me back now!");
+                Handler handler = Global.networkThread.getHandler();
+                Activity activity = Global.networkThread.getCurrentActivity();
+                handler.removeCallbacksAndMessages(null);
+                String message = Global.networkThread.buildString("CALLACCEPT", callerUuid);
+
+                Global.networkThread.sendToServer(message);
+
+                Intent intent = new Intent(activity, InCall.class)
+                        .putExtra("friendUuid", callerUuid);
+                activity.startActivity(intent);
+
             }
         });
 
@@ -94,13 +104,8 @@ public class ReceivedCall extends AppCompatActivity {
                 Activity activity = Global.networkThread.getCurrentActivity();
                 handler.removeCallbacksAndMessages(null);
                 String message = Global.networkThread.buildString("CALLDECLINE", callerUuid);
-                Thread sendToServer = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Global.networkThread.sendToServer(message);
-                    }
-                });
-                sendToServer.start();
+
+                Global.networkThread.sendToServer(message);
 
                 Intent intent = new Intent(activity, activity.getClass());
                 activity.startActivity(intent);

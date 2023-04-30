@@ -30,7 +30,7 @@ public class Server {
             this.ip = ip;
             this.portNumber = port;
             serverSocket = ServerSocketChannel.open();
-            serverSocket.socket().bind(new InetSocketAddress(portNumber));
+            serverSocket.socket().bind(new InetSocketAddress(ip,portNumber));
             serverSocket.configureBlocking(false); // set non-blocking mode
             selector = Selector.open();
             serverSocket.register(selector, SelectionKey.OP_ACCEPT);
@@ -171,42 +171,62 @@ public class Server {
 
         String[] all = message.split("\\|");
         String[] vars = null;
-        if (all.length >= 3)
+        String currentUuid = "";
+        if (all.length > 3) {
             vars = Arrays.copyOfRange(all, 3, all.length);
+            currentUuid = vars[0];
+        }
+
         String action = all[2];
         switch (action) {
 
             case "INIT":
                 //client sent init so variable0 is his uuid! need to save it inside our hashmap
-                Global.putInClientsHashmap(vars[0], clientChannel);
+                Global.putInClientsHashmap(currentUuid, clientChannel);
                 sendToClient(key, MessageBuilder.buildString("ACK"));
                 break;
 
             case "CALL":
-                //client sent call so variable0 is the uuid of who to call! need to call him and put both of them
+                String toCallUuid = vars[1];
+                //client sent call so variable1 is the uuid of who to call! need to call him and put both of them
                 //in the uncallable hashmap since they cant be called
-                if (Global.Clients.containsKey(vars[0]) && !Global.ClientsUnCallable.containsKey(vars[0])) {
+                if (Global.Clients.containsKey(toCallUuid) && !Global.ClientsUnCallable.containsKey(toCallUuid)) {
                     //meaning this client is online and not busy
-                    String senderClientUuid = Global.ClientsInverse.get(clientChannel);  //get the caller uuid
-                    sendToClient(Global.Clients.get(vars[0]), MessageBuilder.buildString("CALL", senderClientUuid)); // send to called client call request from caller
-                    Global.putInUncallableHashmap(senderClientUuid, vars[0]); // add them both to busy hashmap
+
+                    sendToClient(Global.Clients.get(toCallUuid), MessageBuilder.buildString("CALL", currentUuid)); // send to called client call request from caller
+                    Global.putInUncallableHashmap(currentUuid, toCallUuid); // add them both to busy hashmap
                     System.out.println("added them both to uncallable");
                 } else sendToClient(clientChannel, MessageBuilder.buildString("CALLBUSY"));
 
                 break;
 
             case "CALLDECLINE":
-                //client to send him the decline is in vars[0]
+                //client to send him the decline is in vars[1]
+                String toSendDecline = vars[1];
                 //need to send him that the call has been declined and remove both from the uncallable hashmap
-                Global.removeFromUncallableHashmap(vars[0], Global.ClientsInverse.get(clientChannel));
-                sendToClient(Global.Clients.get(vars[0]), MessageBuilder.buildString("CALLDECLINE"));
+                Global.removeFromUncallableHashmap(toSendDecline, currentUuid);
+                sendToClient(Global.Clients.get(toSendDecline), MessageBuilder.buildString("CALLDECLINE"));
+                break;
+
+            case "CALLACCEPT":
+                //client to send him the accept is in vars[1]
+                String toSendAccept = vars[1];
+                //need to send him that the call has been accepted
+                sendToClient(Global.Clients.get(toSendAccept), MessageBuilder.buildString("CALLACCEPT", toSendAccept));
+                break;
+
+            case "CALLSTOP":
+                //client to send him the accept is in vars[1]
+                String toSendStop = vars[1];
+                //need to send him that the call has been stopped
+                sendToClient(Global.Clients.get(toSendStop), MessageBuilder.buildString("CALLSTOP", toSendStop));
+                Global.removeFromUncallableHashmap(currentUuid, toSendStop);
                 break;
 
             case "CLOSE":
-                String uuid = Global.ClientsInverse.get(clientChannel);
-                if (Global.ClientsUnCallable.containsKey(uuid))
-                    Global.removeFromUncallableHashmap(uuid, "NONE");
-                Global.removeFromClientsHashmap(uuid, clientChannel);
+                if (Global.ClientsUnCallable.containsKey(currentUuid))
+                    Global.removeFromUncallableHashmap(currentUuid, "NONE");
+                Global.removeFromClientsHashmap(currentUuid, clientChannel);
                 break;
 
 

@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 import ActivitiesLogic.Friends;
 import ActivitiesLogic.Home;
+import ActivitiesLogic.InCall;
 import ActivitiesLogic.Login;
 import ActivitiesLogic.ReceivedCall;
 
@@ -87,7 +88,7 @@ public class NetworkThread extends Thread{
 
 
     public String buildString(String action, String... vars){
-        String syntaxedStr = "C|" + action + "|";
+        String syntaxedStr = "C|" + action + "|" + userUUID + "|";
         for (String var:vars) {
             syntaxedStr += var + "|";
         }
@@ -127,13 +128,7 @@ public class NetworkThread extends Thread{
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        Thread sendToServer = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                sendToServer(buildString("CALLDECLINE", callerUuid));
-                            }
-                        });
-                        sendToServer.start();
+                        sendToServer(buildString("CALLDECLINE", callerUuid));
                         Intent previousActivityIntent = new Intent(currentActivity, Home.class);
                         currentActivity.startActivity(previousActivityIntent);
                     }
@@ -145,15 +140,29 @@ public class NetworkThread extends Thread{
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        handler.removeCallbacksAndMessages(null); // we might be the ones being called, so we have to stop the
+                                                                        // delay to go back to the previous activity!
+
                         Intent previousActivityIntent = new Intent(currentActivity, Home.class);
                         currentActivity.startActivity(previousActivityIntent);
                     }
                 });
-
-
-
                 break;
 
+            case "CALLACCEPT":
+                //frienduuid is in vars[0]
+                String friendUuid = vars[0];
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handler.removeCallbacksAndMessages(null);
+                        //we called so we have to cancel delay to go back to the previous activity!
+                        Intent previousActivityIntent = new Intent(currentActivity, InCall.class)
+                                .putExtra("friendUuid",friendUuid);
+                        currentActivity.startActivity(previousActivityIntent);
+                    }
+                });
+                break;
 
             case "CALLBUSY":
                 handler.post(new Runnable() {
@@ -164,6 +173,20 @@ public class NetworkThread extends Thread{
                         Toast.makeText(currentActivity, "This user is offline or busy with a call", Toast.LENGTH_SHORT).show();
                     }
                 });
+                break;
+
+            case "CALLSTOP":
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent previousActivityIntent = new Intent(currentActivity, Home.class);
+                        currentActivity.startActivity(previousActivityIntent);
+                    }
+                });
+                break;
+
+
+
 
 
 
@@ -172,19 +195,26 @@ public class NetworkThread extends Thread{
     }
 
     public void sendToServer(String message){
-        try {
-            if (message != null && !message.equals("")) {
-                buffer.put(message.getBytes());
-                buffer.flip();
-                while (buffer.hasRemaining()) {
-                    clientSocket.write(buffer);
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (message != null && !message.equals("")) {
+                        buffer.put(message.getBytes());
+                        buffer.flip();
+                        while (buffer.hasRemaining()) {
+                            clientSocket.write(buffer);
+                        }
+                        buffer.clear();
+                    }
                 }
-                buffer.clear();
+                catch (IOException e){
+                    e.printStackTrace();
+                }
             }
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
+        });
+        t.start();
+
 
     }
 
