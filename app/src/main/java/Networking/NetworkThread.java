@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.os.Handler;
 import android.widget.Toast;
 
+import androidx.camera.view.PreviewView;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
+import java.util.Base64;
 
 import ActivitiesLogic.Friends;
 import ActivitiesLogic.Home;
@@ -24,10 +27,20 @@ public class NetworkThread extends Thread{
     private Activity currentActivity;
     private Handler handler;
 
+    private PreviewView friendCamera;
+
     private SocketChannel clientSocket;
     private int port;
     private String address;
     private ByteBuffer buffer;
+
+    public PreviewView getFriendCamera() {
+        return friendCamera;
+    }
+
+    public void setFriendCamera(PreviewView friendCamera) {
+        this.friendCamera = friendCamera;
+    }
 
     public NetworkThread(String userUUID, String addr, int port){
         this.userUUID = userUUID;
@@ -207,6 +220,8 @@ public class NetworkThread extends Thread{
                         }
                         buffer.clear();
                     }
+
+
                 }
                 catch (IOException e){
                     e.printStackTrace();

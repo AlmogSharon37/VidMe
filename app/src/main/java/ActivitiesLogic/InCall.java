@@ -1,62 +1,66 @@
 package ActivitiesLogic;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.CameraX;
+import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageProxy;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.example.omeglewhatsapphybrid.R;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
-import java.util.List;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 import UtilityClasses.Global;
-import UtilityClasses.User;
-import UtilityClasses.UtilityFunctions;
-import UtilityClasses.VideoView;
 
-public class InCall extends AppCompatActivity implements SurfaceHolder.Callback, Camera.PreviewCallback {
+public class InCall extends AppCompatActivity {
 
 
     FirebaseAuth mAuth;
 
     DatabaseReference mDatabase;
 
-    SurfaceView cameraPictureBig;
-    SurfaceView cameraPictureSmall;
+    PreviewView cameraPictureBig;
+    PreviewView cameraPictureSmall;
 
     ImageButton reportBtn;
     ImageButton muteBtn;
+    ImageButton flipBtn;
 
     ImageButton declineCallBtn;
 
-    Camera camera;
-
+    FirebaseUser currentUser;
     String friendUuid;
     String friendProfilePicStr;
+
+    int currentLensFacing = 0;
+    int currentCameraSurface = 0; // 0 is small, 1 is big
+    PreviewView currentCameraPreview = null;
+
+    ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
 
     int REQUEST_CAMERA_PERMISSION = 1;
 
@@ -78,10 +82,41 @@ public class InCall extends AppCompatActivity implements SurfaceHolder.Callback,
         reportBtn = findViewById(R.id.reportBtn);
         muteBtn = findViewById(R.id.muteBtn);
         declineCallBtn = findViewById(R.id.stopCallBtn);
+        flipBtn = findViewById(R.id.flipCameraBtn);
 
-        SurfaceHolder holder = cameraPictureBig.getHolder();
-        holder.addCallback(this);
+        currentUser = mAuth.getCurrentUser();
+        currentCameraPreview = cameraPictureSmall;
 
+
+        GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                if(currentCameraSurface == 0){
+                    currentCameraSurface = 1;
+                    currentCameraPreview = cameraPictureBig;
+                }
+                else{
+                    currentCameraSurface = 0;
+                    currentCameraPreview = cameraPictureSmall;
+                }
+
+                try {
+                    startCameraX(cameraProviderFuture.get(), currentLensFacing, currentCameraPreview);
+                }
+                catch (ExecutionException | InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                return true;
+            }
+        });
+
+        cameraPictureSmall.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                gestureDetector.onTouchEvent(event);
+                return true;
+            }
+        });
 
         declineCallBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,132 +125,88 @@ public class InCall extends AppCompatActivity implements SurfaceHolder.Callback,
                 Activity activity = Global.networkThread.getCurrentActivity();
                 handler.removeCallbacksAndMessages(null);
                 String message = Global.networkThread.buildString("CALLSTOP", friendUuid);
-                Thread sendToServer = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Global.networkThread.sendToServer(message);
-                    }
-                });
-                sendToServer.start();
+
+                Global.networkThread.sendToServer(message);
+
+
+
 
                 Intent intent = new Intent(activity, Friends.class);
                 activity.startActivity(intent);
-                //speed up the process of waiting till the call request is automatically denied
+
+            }
+        });
+
+
+        flipBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(currentLensFacing == 1){
+                    currentLensFacing = 0;}
+                else currentLensFacing = 1;
+                    try {
+                        startCameraX(cameraProviderFuture.get(), currentLensFacing, currentCameraPreview);
+                    }
+                    catch (ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
             }
         });
 
 
 
-
-
-
-
-
-    }
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-        } else {
-            openCamera(holder);
-        }
-    }
-
-    private void openCamera(SurfaceHolder holder) {
-        camera = Camera.open();
-
-        try {
-            camera.setPreviewDisplay(holder);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        Camera.Parameters parameters = camera.getParameters();
-        List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
-        Camera.Size optimalSize = getOptimalPreviewSize(sizes, width, height);
-
-        parameters.setPreviewSize(optimalSize.width, optimalSize.height);
-        camera.setParameters(parameters);
-        camera.startPreview();
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        camera.stopPreview();
-        camera.release();
-        camera = null;
-    }
-
-    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int width, int height) {
-        final double ASPECT_TOLERANCE = 0.1;
-        double targetRatio = (double) width / height;
-        if (sizes == null) return null;
-
-        Camera.Size optimalSize = null;
-        double minDiff = Double.MAX_VALUE;
-
-        int targetHeight = height;
-        for (Camera.Size size : sizes) {
-            double ratio = (double) size.width / size.height;
-            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (Math.abs(size.height - targetHeight) < minDiff) {
-                optimalSize = size;
-                minDiff = Math.abs(size.height - targetHeight);
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        cameraProviderFuture.addListener(() -> {
+            try{
+                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                startCameraX(cameraProvider, currentLensFacing, cameraPictureSmall); // default
+            } catch (ExecutionException e){
+                e.printStackTrace();
             }
-        }
-
-        if (optimalSize == null) {
-            minDiff = Double.MAX_VALUE;
-            for (Camera.Size size : sizes) {
-                if (Math.abs(size.height - targetHeight) < minDiff) {
-                    optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
-                }
+            catch (InterruptedException e){
+                e.printStackTrace();
             }
-        }
 
-        return optimalSize;
+
+
+        }, getExecutor());
+
     }
 
-    @Override
-    public void onPreviewFrame(byte[] data, Camera camera) {
-        // Send the preview data to your server here
+    private Executor getExecutor() {
+        return ContextCompat.getMainExecutor(this);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        camera = Camera.open();
-        camera.setPreviewCallback(this);
-    }
+    private void startCameraX(ProcessCameraProvider cameraProvider, int lensFacing, PreviewView surface) {
+        cameraProvider.unbindAll();
+        CameraSelector cameraSelector = new CameraSelector.Builder()
+                .requireLensFacing(lensFacing)
+                .build();
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        camera.setPreviewCallback(null);
-        camera.release();
-        camera = null;
-    }
+        //preview use case
+        Preview preview = new Preview.Builder().build();
+        preview.setSurfaceProvider(surface.getSurfaceProvider());
 
+        //image analysis use case (this is used to get each frame and send it to the server!)
+        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build();
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                SurfaceHolder holder = cameraPictureBig.getHolder();
-                openCamera(holder);
-            } else {
-                Toast.makeText(this, "Camera permission not granted", Toast.LENGTH_SHORT).show();
-                finish();
+        imageAnalysis.setAnalyzer(getExecutor(), new ImageAnalysis.Analyzer() {
+            @Override
+            public void analyze(ImageProxy image) {
+                ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+                byte[] bytes = new byte[buffer.remaining()];
+                buffer.get(bytes);
+                // do something with the bytes
+                String cameraData = Base64.getEncoder().encodeToString(bytes);
+                image.close();
             }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+        });
+
+        cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, imageAnalysis, preview);
     }
+
 
 }
