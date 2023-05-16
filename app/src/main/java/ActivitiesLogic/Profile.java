@@ -109,21 +109,10 @@ public class Profile extends AppCompatActivity {
 
         if(requestCode == Actions.CHANGE_PROFILE_PICTURE && resultCode == RESULT_OK && data!=null){
             Uri imagePath = data.getData();
-            getImageInImageView(imagePath);
+            UtilityFunctions.setImageOnImageView(this, imagePath, profilePicBtn);
             uploadImage(imagePath);
 
         }
-    }
-
-    private void getImageInImageView(Uri imagePath) {
-        Bitmap bitmap = null;
-        try{
-            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imagePath);
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
-         profilePicBtn.setImageBitmap(bitmap);
     }
 
     private void uploadImage(Uri imagePath){

@@ -54,8 +54,15 @@ Protocol:
                     or client is offline
                     added variables:       Server - NONE    | Client - the client cannot send this message as it is determined by the server
                     Example:
-                            --> |C|CALL|(to)Client2.uuid         (client1 to server)
-                            --> |S|CALLBUSY                      (server to client1)
+                            --> |C|CALL|Client1.uuid|(to)Client2.uuid          (client1 to server)
+                            --> |S|CALLBUSY                                    (server to client1)
+
+
+        CALLSTOP - prompts server to send the other user in call (Client2) that Client1 stopped the call.
+                   added variables:       Server - NONE    | Client - VAR0 = Client1.uuid, VAR1 = Client2.uuid
+                            Example:
+                                    --> |C|CALLSTOP|Client1.uuid|(to)Client2.uuid         (client1 to server)
+                                    --> |S|CALLSTOP                                       (server to client2)
 
 
 	    CLOSE - prompts server/client to close the connection

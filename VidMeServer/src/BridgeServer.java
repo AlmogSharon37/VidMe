@@ -51,7 +51,7 @@ public class BridgeServer {
                         buffer.flip();
 
                         // process the received data
-                        byte[] data = new byte[buffer.remaining()];
+                        byte[] data = new byte[ buffer.remaining()];
                         buffer.get(data);
                         System.out.println("Received data: " + new String(data));
                     }
