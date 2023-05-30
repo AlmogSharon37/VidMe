@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.platforminfo.GlobalLibraryVersionRegistrar;
 
 import UtilityClasses.Global;
 
@@ -36,7 +37,7 @@ public class Settings extends AppCompatActivity {
 
         //initialization of ui components and firebase stuff.
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
+        if(Global.networkThread!=null)
         Global.networkThread.setCurrentActivity(this);
 
         backBtn = findViewById(R.id.backButton);
@@ -62,6 +63,7 @@ public class Settings extends AppCompatActivity {
             public void onClick(View v) {
                 mAuth.signOut();
                 Global.FIRST_TIME_HOME();
+                if(Global.networkThread!=null)
                 Global.networkThread.closeThread();
                 Global.networkThread = null;
 

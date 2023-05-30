@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.omeglewhatsapphybrid.R;
 
+import Networking.MediaThread;
 import UtilityClasses.Global;
 import UtilityClasses.UtilityFunctions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -96,14 +97,23 @@ public class FriendsProfile extends AppCompatActivity {
         phoneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String message = Global.networkThread.buildString("CALL", friendUid);
-                Thread sendToServer = new Thread(new Runnable() {
+                Global.mediaThread = new MediaThread(friendUid, Global.mediaServerPort, Global.networkServerIp);
+                Global.mediaThread.start();
+                Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        String message = Global.networkThread.buildString("CALL", friendUid, Global.mediaThread.getSocketAddress());
                         Global.networkThread.sendToServer(message);
                     }
                 });
-                sendToServer.start();
+                t.start();
+
+
                 Intent intent = new Intent(getApplicationContext(), Calling.class)
                         .putExtra("friendUuid", friendUid);
 

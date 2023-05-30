@@ -19,6 +19,7 @@ import ActivitiesLogic.Home;
 import ActivitiesLogic.InCall;
 import ActivitiesLogic.Login;
 import ActivitiesLogic.ReceivedCall;
+import UtilityClasses.Global;
 
 public class NetworkThread extends Thread{
     private boolean isRunning = true;
@@ -79,6 +80,7 @@ public class NetworkThread extends Thread{
                 // Wait for connection to be established
 
             }
+            System.out.println(getSocketAddress());
 
             buffer = ByteBuffer.allocate(1024);
 
@@ -150,6 +152,8 @@ public class NetworkThread extends Thread{
 
 
             case "CALLDECLINE":
+                Global.mediaThread.close();
+                Global.mediaThread = null;
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -178,6 +182,8 @@ public class NetworkThread extends Thread{
                 break;
 
             case "CALLBUSY":
+                Global.mediaThread.close();
+                Global.mediaThread = null;
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -189,6 +195,8 @@ public class NetworkThread extends Thread{
                 break;
 
             case "CALLSTOP":
+                Global.mediaThread.close();
+                Global.mediaThread = null;
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -253,5 +261,12 @@ public class NetworkThread extends Thread{
         }
         return "-1|S|ERR";
 
+    }
+
+    public String getSocketAddress() {
+        InetSocketAddress localAddress = (InetSocketAddress) clientSocket.socket().getLocalSocketAddress();
+        String clientAddress = localAddress.getAddress().getHostAddress();
+        int clientPort = localAddress.getPort();
+        return clientAddress+":"+String.valueOf(clientPort);
     }
 }

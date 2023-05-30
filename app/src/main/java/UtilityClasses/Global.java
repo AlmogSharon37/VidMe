@@ -1,11 +1,18 @@
 package UtilityClasses;
 
+
+import Networking.MediaThread;
 import Networking.NetworkThread;
 
 public class Global {
 
     public static int FIRST_TIME_CONNECT_SERVER = 1;
     public static NetworkThread networkThread;
+    public static MediaThread mediaThread;
+
+
+    public static int networkServerPort = 8820, mediaServerPort = 8821;
+    public static String networkServerIp = "10.0.0.8";
 
 
 

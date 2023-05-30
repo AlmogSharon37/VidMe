@@ -7,6 +7,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -66,9 +67,13 @@ public class Home extends AppCompatActivity {
 
             if(Global.FIRST_TIME_CONNECT_SERVER == 1) {
                 Global.FIRST_TIME_HOME();
-                Global.networkThread = new NetworkThread(user.getUid(),"10.0.0.8", 8820);
-                Global.networkThread.setCurrentActivity(this);
-                Global.networkThread.start();
+                if(Global.networkServerIp == null)
+                    Toast.makeText(Home.this, "server configuration not set, logout and configure.", Toast.LENGTH_SHORT).show();
+                else {
+                    Global.networkThread = new NetworkThread(user.getUid(), Global.networkServerIp, Global.networkServerPort);
+                    Global.networkThread.setCurrentActivity(this);
+                    Global.networkThread.start();
+                }
 
             }
 

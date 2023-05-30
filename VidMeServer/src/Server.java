@@ -190,9 +190,10 @@ public class Server {
                 String toCallUuid = vars[1];
                 //client sent call so variable1 is the uuid of who to call! need to call him and put both of them
                 //in the uncallable hashmap since they cant be called
+                //client mediaThread address is in vars[2]
                 if (Global.Clients.containsKey(toCallUuid) && !Global.ClientsUnCallable.containsKey(toCallUuid)) {
                     //meaning this client is online and not busy
-
+                    Global.clientAddresses.put(currentUuid, vars[2]); // saving first clients address to sync up bridge call
                     sendToClient(Global.Clients.get(toCallUuid), MessageBuilder.buildString("CALL", currentUuid)); // send to called client call request from caller
                     Global.putInUncallableHashmap(currentUuid, toCallUuid); // add them both to busy hashmap
                     System.out.println("added them both to uncallable");
@@ -205,22 +206,42 @@ public class Server {
                 String toSendDecline = vars[1];
                 //need to send him that the call has been declined and remove both from the uncallable hashmap
                 Global.removeFromUncallableHashmap(toSendDecline, currentUuid);
+                Global.clientAddresses.remove(toSendDecline); // removing the first clients address as its no longer needed
                 sendToClient(Global.Clients.get(toSendDecline), MessageBuilder.buildString("CALLDECLINE"));
                 break;
 
             case "CALLACCEPT":
                 //client to send him the accept is in vars[1]
+                //client mediaThread address is in vars[2]
                 String toSendAccept = vars[1];
                 //need to send him that the call has been accepted
-                sendToClient(Global.Clients.get(toSendAccept), MessageBuilder.buildString("CALLACCEPT", toSendAccept));
+                Global.addToCalls(vars[2], Global.clientAddresses.get(toSendAccept)); // now they are synced and ready to transfer messages between eachother!
+                System.out.println(Global.calls.get(vars[2]));
+                System.out.println(Global.callsInverted.get(Global.clientAddresses.get(toSendAccept)));
+                sendToClient(Global.Clients.get(toSendAccept), MessageBuilder.buildString("CALLACCEPT", vars[0]));
                 break;
 
             case "CALLSTOP":
-                //client to send him the accept is in vars[1]
+                //client to send him the stop is in vars[1]
                 String toSendStop = vars[1];
                 //need to send him that the call has been stopped
-                sendToClient(Global.Clients.get(toSendStop), MessageBuilder.buildString("CALLSTOP", toSendStop));
+                sendToClient(Global.Clients.get(toSendStop), MessageBuilder.buildString("CALLSTOP", vars[0]));
                 Global.removeFromUncallableHashmap(currentUuid, toSendStop);
+                if(Global.clientAddresses.containsKey(currentUuid)){
+                    // means he is the key for the callsInverted
+                    String client1 = Global.callsInverted.get(Global.clientAddresses.get(currentUuid));
+                    String client2 = Global.calls.get(client1);
+                    Global.removeFromCalls(client1, client2);
+                    Global.clientAddresses.remove(currentUuid);
+                }
+                else{
+                    //means it contains toSendStop
+                    String client1 = Global.callsInverted.get(Global.clientAddresses.get(toSendStop));
+                    String client2 = Global.calls.get(client1);
+                    Global.removeFromCalls(client1, client2);
+                    Global.clientAddresses.remove(toSendStop);
+                }
+
                 break;
 
             case "CLOSE":

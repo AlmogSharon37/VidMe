@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Locale;
 
+import Networking.MediaThread;
 import UtilityClasses.Global;
 import UtilityClasses.User;
 import UtilityClasses.UtilityFunctions;
@@ -86,9 +87,21 @@ public class ReceivedCall extends AppCompatActivity {
                 Handler handler = Global.networkThread.getHandler();
                 Activity activity = Global.networkThread.getCurrentActivity();
                 handler.removeCallbacksAndMessages(null);
-                String message = Global.networkThread.buildString("CALLACCEPT", callerUuid);
-
-                Global.networkThread.sendToServer(message);
+                Global.mediaThread = new MediaThread(callerUuid, Global.mediaServerPort, Global.networkServerIp);
+                Global.mediaThread.start();
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        String message = Global.networkThread.buildString("CALLACCEPT", callerUuid, Global.mediaThread.getSocketAddress());
+                        Global.networkThread.sendToServer(message);
+                    }
+                });
+                t.start();
 
                 Intent intent = new Intent(activity, InCall.class)
                         .putExtra("friendUuid", callerUuid);

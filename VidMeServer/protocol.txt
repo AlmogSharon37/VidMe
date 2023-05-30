@@ -22,10 +22,10 @@ Protocol:
 
 
 	    CALL - prompts server to initiate a call request to a specified user (Client2) from the sender (Client1)
-	           added variables:       Server - VAR0 = Client1.uuid    |     Client - VAR0 = Client1.uuid , VAR1 = Client2.uuid
+	           added variables:       Server - VAR0 = Client1.uuid    |     Client - VAR0 = Client1.uuid , VAR1 = Client2.uuid, VAR3 = Client1.mediaServerAddress
 	           Example:
-               		   --> |C|CALL|Client1.uuid|(to)Client2.uuid            (client1 to server)
-               		   --> |S|CALL|(from)Client1.uuid                       (server to client2)
+               		   --> |C|CALL|Client1.uuid|(to)Client2.uuid|Client1.MediaServerAddress            (client1 to server)
+               		   --> |S|CALL|(from)Client1.uuid                                                  (server to client2)
 
 
 
@@ -40,12 +40,12 @@ Protocol:
 
 	    CALLACCEPT -  prompts server to send the caller (Client1) that the user he called (Client2) has accepted his call request
 	                  and to initiate a call between the clients
-                      added variables:       Server - VAR0 = Client2.uuid      | Client - VAR0 = Client2.uuid, VAR1 = Client1.uuid
+                      added variables:       Server - VAR0 = Client2.uuid      | Client - VAR0 = Client2.uuid, VAR1 = Client1.uuid, VAR3 = Client2.MediaServerAddress
                       Example:
-                               --> |C|CALL|Client1.uuid|(to)Client2.uuid         (client1 to server)
-                               --> |S|CALL|(from)Client1.uuid                    (server to client2)
-                               --> |C|CALLACCEPT|Client2.uuid|Client1.uuid       (client2 to server)
-                               --> |S|CALLACCEPT|Client2.uuid                    (server to client1)
+                               --> |C|CALL|Client1.uuid|(to)Client2.uuid                                    (client1 to server)
+                               --> |S|CALL|(from)Client1.uuid                                               (server to client2)
+                               --> |C|CALLACCEPT|Client2.uuid|Client1.uuid|Client2.MediaServerAddress       (client2 to server)
+                               --> |S|CALLACCEPT|Client2.uuid                                               (server to client1)
 
 
 
@@ -63,6 +63,9 @@ Protocol:
                             Example:
                                     --> |C|CALLSTOP|Client1.uuid|(to)Client2.uuid         (client1 to server)
                                     --> |S|CALLSTOP                                       (server to client2)
+
+
+
 
 
 	    CLOSE - prompts server/client to close the connection

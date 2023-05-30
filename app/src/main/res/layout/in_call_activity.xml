@@ -12,7 +12,15 @@
         android:layout_height="match_parent"
         android:src="@drawable/default_profile_pic"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
+        tools:layout_editor_absoluteY="0dp" >
+
+        <ImageView
+            android:id="@+id/imageViewBig"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            app:srcCompat="@drawable/gradient_background" />
+    </androidx.camera.view.PreviewView>
 
     <androidx.camera.view.PreviewView
         android:id="@+id/smallCamera"
@@ -25,6 +33,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.021"
         app:srcCompat="@drawable/default_profile_pic" />
+
+
+    <ImageView
+        android:id="@+id/imageViewSmall"
+        android:layout_width="131dp"
+        android:layout_height="152dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/smallCamera"
+        app:layout_constraintEnd_toEndOf="@+id/smallCamera"
+        app:layout_constraintStart_toStartOf="@+id/smallCamera"
+        app:layout_constraintTop_toTopOf="@+id/smallCamera"
+        app:srcCompat="@color/grayColor" />
+
 
     <ImageButton
         android:id="@+id/stopCallBtn"

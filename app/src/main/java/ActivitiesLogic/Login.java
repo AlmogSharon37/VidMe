@@ -1,5 +1,6 @@
 package ActivitiesLogic;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -52,6 +53,13 @@ public class Login extends AppCompatActivity {
     Button facebookBtn;
     Button googleBtn;
 
+    Button configureBtn;
+
+    AlertDialog.Builder dialogBuilder;
+    AlertDialog dialog;
+    EditText textCallServerIp;
+    Button setButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +78,14 @@ public class Login extends AppCompatActivity {
         facebookBtn = findViewById(R.id.FacebookBtn);
         googleBtn = findViewById(R.id.GoogleBtn);
 
+        configureBtn = findViewById(R.id.popUpBtn);
 
+        configureBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popUpMenu();
+            }
+        });
 
         goToRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,7 +224,23 @@ public class Login extends AppCompatActivity {
         }
     }
 
+    private void popUpMenu() {
+        dialogBuilder = new AlertDialog.Builder(this);
+        final View MenuView = getLayoutInflater().inflate(R.layout.set_ip_port_menu, null);
+        textCallServerIp = MenuView.findViewById(R.id.textCallServerIp);
+        setButton = MenuView.findViewById(R.id.setBtn);
 
+        setButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String callServerIp = textCallServerIp.getText().toString();
+                Global.networkServerIp = callServerIp;
+            }
+        });
+        dialogBuilder.setView(MenuView);
+        dialog = dialogBuilder.create();
+        dialog.show();
+    }
 
 
 

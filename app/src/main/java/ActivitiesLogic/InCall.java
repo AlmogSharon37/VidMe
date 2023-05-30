@@ -2,6 +2,7 @@ package ActivitiesLogic;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -15,7 +16,9 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.CameraX;
@@ -24,8 +27,10 @@ import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
+
 
 import com.example.omeglewhatsapphybrid.R;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -53,6 +58,9 @@ public class InCall extends AppCompatActivity {
     PreviewView cameraPictureBig;
     PreviewView cameraPictureSmall;
 
+    ImageView cameraPictureBigImageView;
+    ImageView cameraPictureSmallImageView;
+
     ImageButton reportBtn;
     ImageButton muteBtn;
     ImageButton flipBtn;
@@ -77,7 +85,7 @@ public class InCall extends AppCompatActivity {
         setContentView(R.layout.in_call_activity);
 
         mAuth = FirebaseAuth.getInstance();
-
+        Global.mediaThread.setCameraSurface(cameraPictureBigImageView);
 
         //initialization of ui components and firebase stuff.
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -85,6 +93,8 @@ public class InCall extends AppCompatActivity {
 
         cameraPictureBig = findViewById(R.id.BigCamera);
         cameraPictureSmall = findViewById(R.id.smallCamera);
+        cameraPictureBigImageView = findViewById(R.id.imageViewBig);
+        cameraPictureSmallImageView = findViewById(R.id.imageViewSmall);
 
         reportBtn = findViewById(R.id.reportBtn);
         muteBtn = findViewById(R.id.muteBtn);
@@ -94,17 +104,25 @@ public class InCall extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
         currentCameraPreview = cameraPictureSmall;
 
-
+        // change camera surface!
         GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                if(currentCameraSurface == 0){
+                if(currentCameraSurface == 0){ // changing our camera input to the big surface! we need to change the other clients output to the small camera
                     currentCameraSurface = 1;
                     currentCameraPreview = cameraPictureBig;
+                    cameraPictureSmallImageView.setVisibility(View.VISIBLE);
+                    Global.mediaThread.setCameraSurface(cameraPictureSmallImageView);
+                    cameraPictureBigImageView.setVisibility(View.INVISIBLE);
+
+
                 }
                 else{
-                    currentCameraSurface = 0;
+                    currentCameraSurface = 0; // changing our camera input to the small surface! we need to change the other clients output to the big camera
                     currentCameraPreview = cameraPictureSmall;
+                    cameraPictureSmallImageView.setVisibility(View.INVISIBLE);
+                    cameraPictureBigImageView.setVisibility(View.VISIBLE);
+                    Global.mediaThread.setCameraSurface(cameraPictureBigImageView);
                 }
 
                 try {
@@ -161,8 +179,13 @@ public class InCall extends AppCompatActivity {
             }
         });
 
+        startCameraWithPermissions();
 
 
+
+    }
+
+    private void initCamera(){
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
             try{
@@ -178,7 +201,6 @@ public class InCall extends AppCompatActivity {
 
 
         }, getExecutor());
-
     }
 
     private Executor getExecutor() {
@@ -204,12 +226,14 @@ public class InCall extends AppCompatActivity {
             @Override
             public void analyze(ImageProxy image) {
                 Bitmap bitmap = toBitmap(image);
-                System.out.println("WOWOWOW");
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
                 byte[] compressedData = outputStream.toByteArray();
                 // do something with the bytes
-                System.out.println(compressedData.length);
+               // System.out.println(compressedData.length);
+                if(Global.mediaThread != null)
+                Global.mediaThread.sendBytes(compressedData);
+
 
 
                 image.close();
@@ -244,6 +268,44 @@ public class InCall extends AppCompatActivity {
 
         byte[] imageBytes = out.toByteArray();
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+    }
+
+
+    public void startCameraWithPermissions(){
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        && ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            // You can use the API that requires the permission.
+            initCamera();
+        }
+        else {
+            //asking for the permissions
+            // The registered ActivityResultCallback gets the result of this request.
+            String[] permissions = {android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO};
+            ActivityCompat.requestPermissions(this, permissions, 1);
+            }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1) {
+            // Check if all permissions are granted
+            boolean allPermissionsGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+
+            if (allPermissionsGranted) {
+                initCamera();
+            } else {
+                declineCallBtn.callOnClick();
+            }
+        }
     }
 
 

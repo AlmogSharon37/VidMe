@@ -22,6 +22,12 @@
                 android:layout_marginTop="-14dp"
                 app:srcCompat="@drawable/logo" />
 
+            <Button
+                android:id="@+id/popUpBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="configure server" />
+
             <TextView
                 android:id="@+id/WelcomeBackText"
                 android:layout_width="254dp"
