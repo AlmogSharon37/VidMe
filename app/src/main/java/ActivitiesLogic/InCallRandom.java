@@ -10,30 +10,21 @@ import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
-import android.hardware.Camera;
-import android.media.AudioAttributes;
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
-import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
@@ -43,7 +34,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
-
 import com.example.omeglewhatsapphybrid.R;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,21 +42,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import Networking.MediaThread;
 import UtilityClasses.Global;
 
-public class InCall extends AppCompatActivity {
+public class InCallRandom extends AppCompatActivity {
 
 
     FirebaseAuth mAuth;
@@ -84,7 +69,8 @@ public class InCall extends AppCompatActivity {
     ImageButton muteBtn;
     ImageButton flipBtn;
 
-    ImageButton declineCallBtn;
+    ImageButton skipBtn;
+    ImageButton homeBtn;
 
     FirebaseUser currentUser;
     String friendUuid;
@@ -115,7 +101,7 @@ public class InCall extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.in_call_activity);
+        setContentView(R.layout.in_call_with_random_activity);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -130,7 +116,8 @@ public class InCall extends AppCompatActivity {
 
         reportBtn = findViewById(R.id.reportBtn);
         muteBtn = findViewById(R.id.muteBtn);
-        declineCallBtn = findViewById(R.id.stopCallBtn);
+        skipBtn = findViewById(R.id.nextCallBtn);
+        homeBtn = findViewById(R.id.homeBtn);
         flipBtn = findViewById(R.id.flipCameraBtn);
 
         currentUser = mAuth.getCurrentUser();
@@ -187,24 +174,6 @@ public class InCall extends AppCompatActivity {
             }
         });
 
-        declineCallBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Handler handler = Global.networkThread.getHandler();
-                Activity activity = Global.networkThread.getCurrentActivity();
-                handler.removeCallbacksAndMessages(null);
-                String message = Global.networkThread.buildString("CALLSTOP", friendUuid);
-
-                Global.networkThread.sendToServer(message);
-
-
-
-
-                Intent intent = new Intent(activity, Friends.class);
-                activity.startActivity(intent);
-
-            }
-        });
 
 
         flipBtn.setOnClickListener(new View.OnClickListener() {
@@ -231,14 +200,54 @@ public class InCall extends AppCompatActivity {
                     isRunning = false; // stopping the recording thread and clearing values;
                 }
                 else{ // means we need to unmute ourselves
-                     isRunning = true;
-                     Thread t = new Thread(new Runnable() {
-                         @Override
-                         public void run() {
-                             recorderThreadLoop();
-                         }
-                     });
+                    isRunning = true;
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            recorderThreadLoop();
+                        }
+                    });
                 }
+            }
+        });
+
+        skipBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String toSend = Global.networkThread.buildString("NEXT", friendUuid);
+                Global.networkThread.sendToServer(toSend);
+                // need to go back to queue
+                Global.mediaThread.close();
+                Global.mediaThread = new MediaThread(null, Global.mediaServerPort, Global.networkServerIp);
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Global.mediaThread.start();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        String toSend = Global.networkThread.buildString("JOINQ", Global.mediaThread.getSocketAddress());
+                        Global.networkThread.sendToServer(toSend);
+                    }
+                });
+                t.start();
+
+            }
+        });
+
+        homeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Global.mediaThread.close();
+                String toSend = Global.networkThread.buildString("EXIT", friendUuid);
+                Global.networkThread.sendToServer(toSend);
+                Intent intent = new Intent(getApplicationContext(), Home.class);
+                startActivity(intent);
+                finish();
+
             }
         });
 
@@ -249,7 +258,8 @@ public class InCall extends AppCompatActivity {
     }
 
 
-        private void initCamera(){
+
+    private void initCamera(){
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
             try{
@@ -295,7 +305,7 @@ public class InCall extends AppCompatActivity {
 
                 Matrix matrix = new Matrix();
                 if(currentLensFacing == 0)
-                matrix.postRotate(-90);
+                    matrix.postRotate(-90);
 
                 else {matrix.postRotate(-270);};
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
@@ -362,7 +372,7 @@ public class InCall extends AppCompatActivity {
 
     public void startCameraAndMicWithPermissions(){
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-        && ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                && ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
             initCamera();
         }
@@ -371,7 +381,7 @@ public class InCall extends AppCompatActivity {
             // The registered ActivityResultCallback gets the result of this request.
             String[] permissions = {android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO};
             ActivityCompat.requestPermissions(this, permissions, 1);
-            }
+        }
 
     }
 
@@ -392,7 +402,7 @@ public class InCall extends AppCompatActivity {
             if (allPermissionsGranted) {
                 initCamera();
             } else {
-                declineCallBtn.callOnClick();
+                homeBtn.callOnClick();
             }
         }
     }
@@ -436,6 +446,4 @@ public class InCall extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-
 }

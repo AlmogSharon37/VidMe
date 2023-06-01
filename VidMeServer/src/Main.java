@@ -20,9 +20,9 @@ public class Main {
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    bridgeServer.start();
+                    bridgeServer. start();
                 }
-            });
+            }); 
             t.start();
             server.startServer();
         }

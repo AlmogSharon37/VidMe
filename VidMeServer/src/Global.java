@@ -4,6 +4,9 @@ import java.net.Socket;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class Global {
     public static HashMap<String, SocketChannel> Clients;
@@ -12,9 +15,8 @@ public class Global {
 
     public static HashMap<String, String> calls;
     public static HashMap<String, String> callsInverted;
-    public static String client1;
-    public static String client2;
 
+    public static LinkedList<String> queue;
 
 
     public static boolean clientHashMapInit(){
@@ -24,6 +26,7 @@ public class Global {
             calls = new HashMap<>();
             callsInverted = new HashMap<>();
             clientAddresses = new HashMap<>();
+            queue = new LinkedList<>();
             return true;
         }
         catch (Exception e){
@@ -75,13 +78,7 @@ public class Global {
     }
 
 
-    public static String testWithEmulators(String a){
-        if(client1 == null || client2 == null)
-            return null;
-        if(a.equals(client1))
-            return client2;
-        return client1;
-    }
+
 
 
 }

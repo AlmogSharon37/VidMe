@@ -14,9 +14,11 @@ import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Base64;
 
+import ActivitiesLogic.ChoiceCall;
 import ActivitiesLogic.Friends;
 import ActivitiesLogic.Home;
 import ActivitiesLogic.InCall;
+import ActivitiesLogic.InCallRandom;
 import ActivitiesLogic.Login;
 import ActivitiesLogic.ReceivedCall;
 import UtilityClasses.Global;
@@ -120,6 +122,8 @@ public class NetworkThread extends Thread{
 
 
         String action = all[2];
+        if(!action.equals("ERR"))
+            System.out.println(message);
         String toServer;
                 switch (action){
 
@@ -206,6 +210,37 @@ public class NetworkThread extends Thread{
                 });
                 break;
 
+            case "STARTCALL":
+                friendUuid = vars[0];
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handler.removeCallbacksAndMessages(null);
+                        //we called so we have to cancel delay to go back to the previous activity!
+                        Intent previousActivityIntent = new Intent(currentActivity, InCallRandom.class)
+                                .putExtra("friendUuid",friendUuid);
+                        currentActivity.startActivity(previousActivityIntent);
+                    }
+                });
+                break;
+
+
+            case "CALLNEXT":
+                //presending the client a choice, if he wants to get back in queue or exit
+                //both choices make the client go back to home screen, but one causes a press to the omegle button on click (to get in the queue)
+                Global.mediaThread.close();
+                Global.mediaThread = null;
+                // take the client to a different activity, and ask there
+                //TODO
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handler.removeCallbacksAndMessages(null);
+                        Intent previousActivityIntent = new Intent(currentActivity, ChoiceCall.class);
+                        currentActivity.startActivity(previousActivityIntent);
+                    }
+                });
+                break;
 
 
 

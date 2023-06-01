@@ -110,6 +110,18 @@
                 <action android:name="android.intent.action.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name="ActivitiesLogic.InCallRandom"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name="ActivitiesLogic.ChoiceCall"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DEFAULT" />
+            </intent-filter>
+        </activity>
 
 
 

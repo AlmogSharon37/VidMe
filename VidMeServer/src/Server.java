@@ -244,6 +244,93 @@ public class Server {
 
                 break;
 
+            case "JOINQ":
+                //client uuid is in vars[0], client ip is in vars[1]
+                Global.putInUncallableHashmap(currentUuid, null);
+                if(Global.queue.isEmpty()){
+                    // need to add client to clientAddresses and to uncallable
+                    Global.clientAddresses.put(currentUuid, vars[1]);
+                    Global.queue.add(currentUuid);
+                }
+                else { // meaning we need to add this client to a call with someone from the queue
+                    String client1 = Global.queue.getFirst();
+                    //send client in queue callAccept
+                    String toSendToClientInQueue = MessageBuilder.buildString("STARTCALL", currentUuid);
+                    sendToClient(Global.Clients.get(client1), toSendToClientInQueue);
+
+                    //send this client the info of the client in queue and tell him to join a call
+                    String toSend = MessageBuilder.buildString("STARTCALL", client1);
+                    sendToClient(Global.Clients.get(currentUuid), toSend);
+
+                    Global.queue.removeFirst();
+                    Global.addToCalls(vars[1], Global.clientAddresses.get(client1));
+
+
+
+
+
+                }
+                break;
+            case "NEXT":
+                String toSendNext = vars[1];
+
+                //need to remove this client and his friend from calls
+                if(Global.clientAddresses.containsKey(currentUuid)){
+                    // means he is the key for the callsInverted
+                    String client1 = Global.callsInverted.get(Global.clientAddresses.get(currentUuid));
+                    String client2 = Global.calls.get(client1);
+                    Global.removeFromCalls(client1, client2);
+                    Global.clientAddresses.remove(currentUuid);
+                }
+                else{
+                    //means it contains toSendNext
+                    String client1 = Global.callsInverted.get(Global.clientAddresses.get(toSendNext));
+                    String client2 = Global.calls.get(client1);
+                    Global.removeFromCalls(client1, client2);
+                    Global.clientAddresses.remove(toSendNext);
+                }
+
+                //we need to send his friend that the call is done and he should get a choice
+                sendToClient(Global.Clients.get(toSendNext), MessageBuilder.buildString("CALLNEXT"));
+                break;
+
+
+
+
+            case "EXIT":
+                String toSendExit = vars[1];
+
+                if(toSendExit.equals("NONE")) {
+                    // both clients are already out of the calls hashmap, and the other client initiated the exit so he doesnt need to send him
+                    Global.removeFromUncallableHashmap(currentUuid, null);
+                    break;
+                }
+
+                //need to remove this client and his friend from calls
+                if(Global.clientAddresses.containsKey(currentUuid)){
+                    // means he is the key for the callsInverted
+                    String client1 = Global.callsInverted.get(Global.clientAddresses.get(currentUuid));
+                    String client2 = Global.calls.get(client1);
+                    Global.removeFromCalls(client1, client2);
+                    Global.clientAddresses.remove(currentUuid);
+                }
+                else{
+                    //means it contains toSendExit
+                    String client1 = Global.callsInverted.get(Global.clientAddresses.get(toSendExit));
+                    String client2 = Global.calls.get(client1);
+                    Global.removeFromCalls(client1, client2);
+                    Global.clientAddresses.remove(toSendExit);
+
+                }
+
+                // current client is exiting the calls completely, need to remove him from clientsUncallable
+                Global.removeFromUncallableHashmap(currentUuid, null);
+
+                //we need to send his friend that the call is done and he should get a choice
+                sendToClient(Global.Clients.get(toSendExit), MessageBuilder.buildString("CALLNEXT"));
+
+                break;
+
             case "CLOSE":
                 if (Global.ClientsUnCallable.containsKey(currentUuid))
                     Global.removeFromUncallableHashmap(currentUuid, "NONE");

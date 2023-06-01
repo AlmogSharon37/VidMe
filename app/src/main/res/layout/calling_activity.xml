@@ -6,14 +6,18 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
+
     <ImageView
 
         android:id="@+id/callerProfilePic"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="410dp"
+        android:layout_height="513dp"
+        android:layout_marginBottom="188dp"
         android:src="@drawable/default_profile_pic"
-        tools:layout_editor_absoluteX="-26dp"
-        tools:layout_editor_absoluteY="-339dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/incomingCallText"
@@ -21,30 +25,31 @@
         android:layout_height="wrap_content"
         android:text="Calling!"
         android:textAlignment="center"
-        android:textSize="40dp"
         android:textColor="@color/grayColor"
+        android:textSize="40dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/callerProfilePic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/callerProfilePic"
-        app:layout_constraintVertical_bias="0.047" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.153" />
 
     <TextView
         android:id="@+id/callerName"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/grayColor"
-        android:textStyle="bold"
         android:text="{Name}"
         android:textAlignment="center"
+        android:textColor="@color/grayColor"
         android:textSize="35dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/callerProfilePic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/incomingCallText"
-        app:layout_constraintVertical_bias="0.011" />
-
+        app:layout_constraintVertical_bias="0.043" />
 
     <ImageButton
         android:id="@+id/declineBtn"
@@ -55,11 +60,10 @@
         android:scaleY="1.3"
         android:src="@drawable/decline_call_btn"
 
-        app:layout_constraintBottom_toBottomOf="@+id/callerProfilePic"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.888" />
+        app:layout_constraintTop_toBottomOf="@+id/callerProfilePic" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

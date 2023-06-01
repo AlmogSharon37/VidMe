@@ -52,13 +52,8 @@ public class BridgeServer {
                         // read data from the channel
                         ByteBuffer buffer = ByteBuffer.allocate(32000);
                         InetSocketAddress senderAddress = (InetSocketAddress) bridgeChannel.receive(buffer);
-                        if(Global.client1 == null)
-                            Global.client1 = senderAddress.getHostString() + ":" + senderAddress.getPort();
-                        else if(Global.client2 == null && !Global.client1.equals(senderAddress.getHostString() + ":" + senderAddress.getPort()))
-                            Global.client2 = senderAddress.getHostString() + ":" + senderAddress.getPort();
                         buffer.flip();
-                        //System.out.println(Global.client1);
-                        //System.out.println(Global.client2);
+
                         // process the received data
                         byte[] data = new byte[ buffer.remaining()];
                         buffer.get(data);
@@ -81,6 +76,12 @@ public class BridgeServer {
         String addressStr = address.getHostString() + ":" + address.getPort();
         //System.out.println("udp server got message from " + addressStr + ": " + info.length );
         //we need to redirect the info to the other client
+        //sendToClient(addressStr, info);
+        sendBackToClientTest(address, info);
+
+    }
+
+    public void sendToClient(String addressStr, byte[] info){
         HashMap<String, String> which = Global.getWhichHashmap(addressStr);
         if(which == null)
             return;
@@ -88,28 +89,25 @@ public class BridgeServer {
 
         String[] addressPort = addressToSendTo.split(":");
         InetSocketAddress clientSocketAddress = new InetSocketAddress(addressPort[0], Integer.parseInt(addressPort[1]));
-        System.out.println(clientSocketAddress.toString());
-        //String toSendAddress = Global.testWithEmulators(addressStr);
-        //if(toSendAddress != null){
-         //   String[] addressPort = toSendAddress.split(":");
 
-           // InetSocketAddress clientSocketAddress = new InetSocketAddress(addressPort[0], Integer.parseInt(addressPort[1]));
-           // try {
-            //    System.out.println("sending " + info.length + " bytes to - " + toSendAddress + " from ---> " + addressStr);
-           //     bridgeChannel.send(ByteBuffer.wrap(info), clientSocketAddress);
-          //  } catch (IOException e) {
-           //     throw new RuntimeException(e);
-          //  }
-       // }
-
-        // Send the response packet to the client
+            // Send the response packet to the client
         try {
             bridgeChannel.send(ByteBuffer.wrap(info), clientSocketAddress);
-            System.out.println("sending " + info.length + " bytes to - " + clientSocketAddress + " from ---> " + addressStr);
+            //System.out.println("sending " + info.length + " bytes to - " + clientSocketAddress + " from ---> " + addressStr);
         } catch (IOException e) {
-               throw new RuntimeException(e);
-          }
+            throw new RuntimeException(e);
+        }
     }
+
+    public void sendBackToClientTest(InetSocketAddress address, byte[] info){
+        try {
+            //System.out.println("sending to client hello! " + address.getHostString() + ":" + address.getPort());
+            bridgeChannel.send(ByteBuffer.wrap(info), address);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 
 

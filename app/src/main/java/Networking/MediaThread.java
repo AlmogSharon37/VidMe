@@ -4,6 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.AudioAttributes;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.media.Image;
 import android.os.Handler;
 import android.view.View;
@@ -11,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.camera.view.PreviewView;
+
+import com.google.gson.internal.bind.TreeTypeAdapter;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -46,34 +53,60 @@ public class MediaThread extends Thread{
     private String address;
     private ByteBuffer buffer;
 
+    private AudioTrack audioTrack;
+
+
+    int audioSampleRate = 44100;  // Sample rate in Hz
+    int audioChannelConfig = AudioFormat.CHANNEL_OUT_STEREO;
+    int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+    int bufferSize = AudioTrack.getMinBufferSize(audioSampleRate, audioChannelConfig, audioFormat);
+
     public MediaThread(String friendUUID, int port, String address) {
         this.cameraSurface = null;
         this.friendUUID = friendUUID;
         this.port = port;
         this.address = address;
         this.buffer = ByteBuffer.allocate(32000);
+        handler = new Handler();
+        audioTrack = new AudioTrack.Builder()
+                .setAudioAttributes(new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build())
+                .setAudioFormat(new AudioFormat.Builder()
+                        .setEncoding(audioFormat)
+                        .setSampleRate(audioSampleRate)
+                        .setChannelMask(audioChannelConfig)
+                        .build())
+                .setBufferSizeInBytes(bufferSize)
+                .setTransferMode(AudioTrack.MODE_STREAM)
+                .build();
+
+        //audioTrack.setPlaybackRate(sampleRate)
+        //audioTrack.setStereoVolume(2.0f, 2.0f);
+
     }
 
     @Override
     public void run(){
         try {
             System.out.println("Starting");
+            System.out.println(bufferSize);
             clientChannel = DatagramChannel.open();
-            System.out.println("opened");
             clientChannel.configureBlocking(false);
             clientChannel.connect(new InetSocketAddress(address, port));
-            System.out.println("getting into server");
             while (!clientChannel.isConnected()) {
                 // Wait for connection to be established
             }
-            System.out.println("got into server");
+            System.out.println("listening for messages from the bridgeServer");
+            audioTrack.play(); // starting to play audio received by server.
             // Continuously listen for messages from the server
             byte[] message;
             while (isRunning) {
                 message = recvMessage();
                 if(message.length == 0)
                     continue;
-                System.out.println(message.length);
+                //System.out.println(message.length);
                 handleMessage(message);
 
             }
@@ -87,6 +120,7 @@ public class MediaThread extends Thread{
 
     private byte[] recvMessage() {
         try {
+            buffer.clear();
             clientChannel.receive(buffer);
             buffer.flip();
             byte[] receivedData = new byte[buffer.remaining()];
@@ -110,7 +144,23 @@ public class MediaThread extends Thread{
     }
 
     public void handleMessage(byte[] bytes){
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        //first 4 bytes are the length of the image!
+        byte[] lengthBytes = new byte[4];
+        System.arraycopy(bytes, 0, lengthBytes, 0, 4);
+        int imageLength = 0;
+        for (byte b : lengthBytes) {
+            imageLength = (imageLength << 8) + (b & 0xFF);
+        }
+
+        byte[] imageData = new byte[imageLength];
+        System.arraycopy(bytes, 4, imageData, 0, imageLength);
+
+        byte[] recorderData = new byte[bytes.length - imageLength - 4];
+        System.arraycopy(bytes, imageLength + 44, recorderData, 0, recorderData.length - 44);
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+
+
         if(cameraSurface != null) {
             // Create a Lock object
             Lock lock = new ReentrantLock();
@@ -118,13 +168,24 @@ public class MediaThread extends Thread{
             // Acquire the lock
             lock.lock();
             try {
-                cameraSurface.setImageBitmap(bitmap);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        cameraSurface.setImageBitmap(bitmap);
+                    }
+                });
+
             } finally {
                 lock.unlock();
             }
 
         }
-
+        try {
+            audioTrack.write(recorderData, 0, recorderData.length);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void sendBytes(byte[] message){
@@ -151,6 +212,8 @@ public class MediaThread extends Thread{
 
     public void close() {
         isRunning = false;
+        audioTrack.stop();
+        audioTrack.release();
     }
 
     public ImageView getCameraSurface() {

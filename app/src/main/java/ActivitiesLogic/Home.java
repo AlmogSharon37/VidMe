@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 //import com.facebook.CallbackManager;
 import com.example.omeglewhatsapphybrid.R;
 
+import Networking.MediaThread;
 import Networking.NetworkThread;
 import UtilityClasses.Global;
 import UtilityClasses.UtilityFunctions;
@@ -38,7 +39,7 @@ public class Home extends AppCompatActivity {
     ImageButton friendsBtn;
     ImageButton settingsBtn;
 
-    ImageButton omegleBtn;
+    public ImageButton omegleBtn;
 
         @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +113,41 @@ public class Home extends AppCompatActivity {
                     Intent intent = new Intent(getApplicationContext(), Friends.class);
                     startActivity(intent);
                     finish();
+                }
+            });
+
+            omegleBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Global.mediaThread = new MediaThread(null, Global.mediaServerPort, Global.networkServerIp);
+                    Global.mediaThread.start();
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            String message = Global.networkThread.buildString("JOINQ", user.getUid(), Global.mediaThread.getSocketAddress());
+                            Global.networkThread.sendToServer(message);
+                        }
+                    });
+                    t.start();
+
+                    friendsBtn.setVisibility(View.INVISIBLE);
+                    omegleBtn.setVisibility(View.INVISIBLE);
+                    inboxBtn.setVisibility(View.INVISIBLE);
+                    settingsBtn.setVisibility(View.INVISIBLE);
+                    findViewById(R.id.Logo).setVisibility(View.INVISIBLE);
+                    NameText.setVisibility(View.INVISIBLE);
+                    findViewById(R.id.TextHello).setVisibility(View.INVISIBLE);
+                    profileBtn.setVisibility(View.INVISIBLE);
+
+                    findViewById(R.id.inQueueText).setVisibility(View.VISIBLE);
+                    findViewById(R.id.grayBackground).setVisibility(View.VISIBLE);
+
+
                 }
             });
 
