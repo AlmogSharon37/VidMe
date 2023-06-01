@@ -12,6 +12,7 @@
         android:id="@+id/callerProfilePic"
         android:layout_width="410dp"
         android:layout_height="513dp"
+        android:scaleType="fitXY"
         android:layout_marginBottom="188dp"
         android:src="@drawable/default_profile_pic"
         app:layout_constraintBottom_toBottomOf="parent"

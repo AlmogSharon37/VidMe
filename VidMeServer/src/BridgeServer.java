@@ -76,8 +76,8 @@ public class BridgeServer {
         String addressStr = address.getHostString() + ":" + address.getPort();
         //System.out.println("udp server got message from " + addressStr + ": " + info.length );
         //we need to redirect the info to the other client
-        //sendToClient(addressStr, info);
-        sendBackToClientTest(address, info);
+        sendToClient(addressStr, info);
+        //sendBackToClientTest(address, info);
 
     }
 

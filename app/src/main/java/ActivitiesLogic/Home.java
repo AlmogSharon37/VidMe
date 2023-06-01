@@ -129,7 +129,7 @@ public class Home extends AppCompatActivity {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            String message = Global.networkThread.buildString("JOINQ", user.getUid(), Global.mediaThread.getSocketAddress());
+                            String message = Global.networkThread.buildString("JOINQ", Global.mediaThread.getSocketAddress());
                             Global.networkThread.sendToServer(message);
                         }
                     });
@@ -143,11 +143,33 @@ public class Home extends AppCompatActivity {
                     NameText.setVisibility(View.INVISIBLE);
                     findViewById(R.id.TextHello).setVisibility(View.INVISIBLE);
                     profileBtn.setVisibility(View.INVISIBLE);
+                    findViewById(R.id.linearLayoutButtons).setVisibility(View.INVISIBLE);
 
                     findViewById(R.id.inQueueText).setVisibility(View.VISIBLE);
                     findViewById(R.id.grayBackground).setVisibility(View.VISIBLE);
+                    findViewById(R.id.homeBtn).setVisibility(View.VISIBLE);
 
 
+                }
+            });
+
+            findViewById(R.id.homeBtn).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    findViewById(R.id.inQueueText).setVisibility(View.INVISIBLE);
+                    findViewById(R.id.grayBackground).setVisibility(View.INVISIBLE);
+                    findViewById(R.id.homeBtn).setVisibility(View.INVISIBLE);
+
+                    friendsBtn.setVisibility(View.VISIBLE);
+                    omegleBtn.setVisibility(View.VISIBLE);
+                    inboxBtn.setVisibility(View.VISIBLE);
+                    settingsBtn.setVisibility(View.VISIBLE);
+                    findViewById(R.id.Logo).setVisibility(View.VISIBLE);
+                    NameText.setVisibility(View.VISIBLE);
+                    findViewById(R.id.TextHello).setVisibility(View.VISIBLE);
+                    profileBtn.setVisibility(View.VISIBLE);
+                    String message = Global.networkThread.buildString("EXIT", "NONE");
+                    Global.networkThread.sendToServer(message);
                 }
             });
 

@@ -156,6 +156,7 @@ public class NetworkThread extends Thread{
 
 
             case "CALLDECLINE":
+                if(Global.mediaThread != null)
                 Global.mediaThread.close();
                 Global.mediaThread = null;
                 handler.post(new Runnable() {

@@ -91,6 +91,7 @@ public class InCallRandom extends AppCompatActivity {
     int bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
 
     boolean isRunning = true;
+    boolean pressedSkip = false;
 
     byte[] recorderArray;
     AudioRecord audioRecord;
@@ -126,6 +127,7 @@ public class InCallRandom extends AppCompatActivity {
         recorderArray = new byte[bufferSize];
 
         Global.mediaThread.setCameraSurface(cameraPictureBigImageView);
+
 
         Thread t = new Thread(new Runnable() {
             @Override
@@ -198,15 +200,18 @@ public class InCallRandom extends AppCompatActivity {
             public void onClick(View v) {
                 if(isRunning){ // means we are muting ourselves
                     isRunning = false; // stopping the recording thread and clearing values;
+                    muteBtn.setImageResource(R.drawable.unmute_btn);
                 }
                 else{ // means we need to unmute ourselves
                     isRunning = true;
+                    muteBtn.setImageResource(R.drawable.mute_btn);
                     Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
                             recorderThreadLoop();
                         }
                     });
+                    t.start();
                 }
             }
         });
@@ -214,6 +219,7 @@ public class InCallRandom extends AppCompatActivity {
         skipBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pressedSkip = true;
                 String toSend = Global.networkThread.buildString("NEXT", friendUuid);
                 Global.networkThread.sendToServer(toSend);
                 // need to go back to queue
@@ -242,7 +248,13 @@ public class InCallRandom extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Global.mediaThread.close();
-                String toSend = Global.networkThread.buildString("EXIT", friendUuid);
+                String toSend = null;
+                if(pressedSkip){
+                    toSend = Global.networkThread.buildString("EXIT", "NONE");
+                }
+                else{
+                toSend = Global.networkThread.buildString("EXIT", friendUuid);
+                }
                 Global.networkThread.sendToServer(toSend);
                 Intent intent = new Intent(getApplicationContext(), Home.class);
                 startActivity(intent);

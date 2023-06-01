@@ -64,8 +64,8 @@ public class Settings extends AppCompatActivity {
                 mAuth.signOut();
                 Global.FIRST_TIME_HOME();
                 if(Global.networkThread!=null)
-                Global.networkThread.closeThread();
-                Global.networkThread = null;
+                    Global.networkThread.closeThread();
+                    Global.networkThread = null;
 
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);

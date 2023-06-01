@@ -158,6 +158,7 @@ public class InCall extends AppCompatActivity {
                     cameraPictureSmallImageView.setVisibility(View.VISIBLE);
                     Global.mediaThread.setCameraSurface(cameraPictureSmallImageView);
                     cameraPictureBigImageView.setVisibility(View.INVISIBLE);
+                    cameraPictureSmall.setVisibility(View.INVISIBLE);
 
 
                 }
@@ -167,6 +168,7 @@ public class InCall extends AppCompatActivity {
                     cameraPictureSmallImageView.setVisibility(View.INVISIBLE);
                     cameraPictureBigImageView.setVisibility(View.VISIBLE);
                     Global.mediaThread.setCameraSurface(cameraPictureBigImageView);
+                    cameraPictureSmall.setVisibility(View.VISIBLE);
                 }
 
                 try {
@@ -229,15 +231,18 @@ public class InCall extends AppCompatActivity {
             public void onClick(View v) {
                 if(isRunning){ // means we are muting ourselves
                     isRunning = false; // stopping the recording thread and clearing values;
+                    muteBtn.setImageResource(R.drawable.unmute_btn);
                 }
                 else{ // means we need to unmute ourselves
                      isRunning = true;
+                     muteBtn.setImageResource(R.drawable.mute_btn);
                      Thread t = new Thread(new Runnable() {
                          @Override
                          public void run() {
                              recorderThreadLoop();
                          }
                      });
+                     t.start();
                 }
             }
         });

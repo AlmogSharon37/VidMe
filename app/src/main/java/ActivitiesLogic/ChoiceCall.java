@@ -69,13 +69,12 @@ public class ChoiceCall extends AppCompatActivity {
                 });
                 t.start();
 
-                //hide everything else and show the other stuff
-                //TODO
+                //hide everything and show other stuff
                 homeBtn.setVisibility(View.INVISIBLE);
                 skipBtn.setVisibility(View.INVISIBLE);
                 findViewById(R.id.textError).setVisibility(View.INVISIBLE);
 
-
+                findViewById(R.id.homeBtnInvis).setVisibility(View.VISIBLE);
                 findViewById(R.id.inQueueText).setVisibility(View.VISIBLE);
 
 
@@ -91,6 +90,13 @@ public class ChoiceCall extends AppCompatActivity {
                 startActivity(intent);
                 finish();
 
+            }
+        });
+
+        findViewById(R.id.homeBtnInvis).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                homeBtn.callOnClick();
             }
         });
 

@@ -301,6 +301,13 @@ public class Server {
                 String toSendExit = vars[1];
 
                 if(toSendExit.equals("NONE")) {
+
+                    if(Global.clientAddresses.containsKey(currentUuid)){
+                        Global.clientAddresses.remove(currentUuid);
+                        Global.queue.removeFirst();
+                    }
+
+
                     // both clients are already out of the calls hashmap, and the other client initiated the exit so he doesnt need to send him
                     Global.removeFromUncallableHashmap(currentUuid, null);
                     break;
@@ -320,6 +327,7 @@ public class Server {
                     String client2 = Global.calls.get(client1);
                     Global.removeFromCalls(client1, client2);
                     Global.clientAddresses.remove(toSendExit);
+
 
                 }
 

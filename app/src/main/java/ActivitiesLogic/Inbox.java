@@ -93,6 +93,7 @@ public class Inbox extends AppCompatActivity {
             @Override
             public void onClick(int position) {
                 UtilityFunctions.removeRequestFromUser(mDatabase, userRequests.get(position).getUid(), currentUser.getUid());
+                UtilityFunctions.removeRequestFromUser(mDatabase, userRequests.get(position).getUid(), currentUser.getUid());
 
             }
         };

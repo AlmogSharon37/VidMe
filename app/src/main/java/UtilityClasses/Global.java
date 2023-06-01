@@ -12,7 +12,7 @@ public class Global {
 
 
     public static int networkServerPort = 8820, mediaServerPort = 8821;
-    public static String networkServerIp = "10.0.0.8";
+    public static String networkServerIp;
 
 
 
